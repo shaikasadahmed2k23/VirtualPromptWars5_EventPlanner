@@ -61,7 +61,6 @@ export default function AssistantPage() {
         status={ai.status}
         error={ai.error}
         onRetry={() => void ai.retry()}
-        loadingMessage="Crafting your plan…"
         successMessage="Your plan is ready."
       />
       {ai.isWorking ? (

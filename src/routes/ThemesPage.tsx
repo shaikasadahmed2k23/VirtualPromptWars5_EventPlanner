@@ -48,7 +48,6 @@ export default function ThemesPage() {
         status={themes.status}
         error={themes.error}
         onRetry={() => void themes.generate()}
-        loadingMessage="Curating theme ideas…"
         successMessage="Three themes are ready."
       />
 

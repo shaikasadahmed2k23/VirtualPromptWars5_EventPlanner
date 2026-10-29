@@ -2,7 +2,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { AI_SERVER_TIMEOUT_MS } from '../shared/limits.js';
 
-/** Current stable Gemini Flash model (verified against ai.google.dev/gemini-api/docs/models). */
+/** Default Gemini Flash model; keep this synchronized with GEMINI_MODEL in .env.example. */
 export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
 
 const DEFAULT_PORT = 8787;

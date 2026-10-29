@@ -1,11 +1,11 @@
 import { ErrorState } from '@/components/ui/states';
+import { useLoadingStatusMessage } from '@/lib/hooks/useLoadingStatusMessage';
 import type { AsyncStatus } from '@/types';
 
 interface AIStatusProps {
   status: AsyncStatus;
   error: string | null;
   onRetry: () => void;
-  loadingMessage: string;
   successMessage: string;
 }
 
@@ -13,7 +13,8 @@ interface AIStatusProps {
  * Announces AI progress to screen readers via a polite live region, and shows
  * a friendly error with Retry when a request fails.
  */
-export function AIStatus({ status, error, onRetry, loadingMessage, successMessage }: AIStatusProps) {
+export function AIStatus({ status, error, onRetry, successMessage }: AIStatusProps) {
+  const loadingMessage = useLoadingStatusMessage(status === 'loading');
   const announcement = status === 'loading' ? loadingMessage : status === 'success' ? successMessage : '';
   return (
     <>
