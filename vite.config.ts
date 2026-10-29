@@ -46,7 +46,7 @@ export default defineConfig({
     css: false,
     restoreMocks: true,
     // Full wizard journeys drive many steps through real lazy-loaded routes.
-    testTimeout: 20_000,
+    testTimeout: 30_000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],

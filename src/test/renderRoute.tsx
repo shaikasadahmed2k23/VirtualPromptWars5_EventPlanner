@@ -12,7 +12,7 @@ export interface RenderRouteResult extends RenderResult {
 /** Renders the real application route table at `path` in a memory router. */
 export function renderRoute(path: string): RenderRouteResult {
   const router = createMemoryRouter(routes, { initialEntries: [path], future: ROUTER_FUTURE_FLAGS });
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
   const result = render(<RouterProvider router={router} future={{ v7_startTransition: true }} />);
   return { ...result, user, router };
 }
