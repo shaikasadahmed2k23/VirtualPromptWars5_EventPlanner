@@ -1,0 +1,50 @@
+import { useCallback } from 'react';
+import { toast } from 'sonner';
+import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
+import { useTaskStore } from '@/features/tasks/store/useTaskStore';
+import { nowISO } from '@/lib/dates';
+import type { BudgetItemInput, CelebrationEvent, TaskInput } from '@/types';
+import { useAssistantStore } from '../store/useAssistantStore';
+
+/**
+ * One-click actions from the AI plan: add to checklist, add to budget and
+ * save the plan. Every action confirms with a toast that offers Undo.
+ */
+export function usePlanActions(event: CelebrationEvent) {
+  const addTask = useTaskStore((state) => state.addTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
+  const addItem = useBudgetStore((state) => state.addItem);
+  const deleteItem = useBudgetStore((state) => state.deleteItem);
+  const setSavedAt = useAssistantStore((state) => state.setSavedAt);
+
+  const addToChecklist = useCallback(
+    (input: TaskInput) => {
+      const task = addTask(event.id, input, 'ai');
+      toast.success(`Added “${input.title}” to your checklist`, {
+        action: { label: 'Undo', onClick: () => deleteTask(task.id) },
+      });
+    },
+    [addTask, deleteTask, event.id],
+  );
+
+  const addToBudget = useCallback(
+    (input: BudgetItemInput) => {
+      const item = addItem(event.id, input);
+      toast.success(`Added “${input.name}” to your budget`, {
+        action: { label: 'Undo', onClick: () => deleteItem(item.id) },
+      });
+    },
+    [addItem, deleteItem, event.id],
+  );
+
+  const savePlan = useCallback(() => {
+    const previous = useAssistantStore.getState().plans[event.id]?.savedAt ?? null;
+    setSavedAt(event.id, nowISO());
+    toast.success('Plan saved to your event', {
+      description: 'Your dashboard now shows it as your chosen plan.',
+      action: { label: 'Undo', onClick: () => setSavedAt(event.id, previous) },
+    });
+  }, [event.id, setSavedAt]);
+
+  return { addToChecklist, addToBudget, savePlan };
+}

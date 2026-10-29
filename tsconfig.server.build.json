@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.server.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "exclude": ["server/**/*.test.ts", "server/test", "shared/**/*.test.ts"]
+}
