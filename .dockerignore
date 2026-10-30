@@ -1,17 +1,13 @@
+@'
 node_modules
 dist
 dist-server
-.env*
-.git
-.gitignore
 coverage
-**/*.test.*
-**/tests
-**/__tests__
-**/screenshots
-screenshots
-*.snap
+.env
+.env.*
+!.env.example
+.git
+.vscode
 *.log
-*.tsbuildinfo
-README*
-DEPLOY.md
+screenshots
+'@ | Set-Content -Encoding ascii .dockerignore
