@@ -114,6 +114,9 @@ describe('PlanWizardPage', () => {
 
     expect(view.router.state.location.pathname).toMatch(/^\/events\/.+$/);
     expect(await screen.findByText('M&A is ready')).toBeInTheDocument();
+    // The toast lives in the root layout; also wait for the lazy dashboard route itself to
+    // render, so its chunk never resolves after this test (outside act) and leaks into the next.
+    expect(await screen.findByRole('heading', { level: 1, name: 'M&A' })).toBeInTheDocument();
     const created = useEventStore.getState().events.find((event) => event.name === 'M&A');
     expect(useTaskStore.getState().tasks.filter((task) => task.eventId === created?.id).length).toBeGreaterThan(5);
     expect(useWizardDraftStore.getState().stepIndex).toBe(0);
