@@ -81,7 +81,11 @@ interface ChartCardProps extends BudgetChartsProps {
   children: ReactNode;
 }
 
-/** Card with a chart and a "View as table" toggle for screen reader and keyboard users. */
+/**
+ * Card with a chart and a "View as table" toggle for screen reader and keyboard users.
+ * The chart itself is one labelled image; Recharts' own keyboard layer is turned off
+ * so it does not add unnamed tab stops inside it.
+ */
 function ChartCard({ title, description, rows, currency, children }: ChartCardProps) {
   const [showTable, setShowTable] = useState(false);
   return (
@@ -127,7 +131,7 @@ export function BudgetCharts({ rows, currency }: BudgetChartsProps) {
         rows={rows}
         currency={currency}
       >
-        <PieChart>
+        <PieChart accessibilityLayer={false}>
           <Pie
             data={donutRows}
             dataKey="forecast"
@@ -135,6 +139,7 @@ export function BudgetCharts({ rows, currency }: BudgetChartsProps) {
             innerRadius="55%"
             outerRadius="78%"
             paddingAngle={2}
+            rootTabIndex={-1}
           />
           <Tooltip formatter={money} />
           <Legend />
@@ -146,7 +151,7 @@ export function BudgetCharts({ rows, currency }: BudgetChartsProps) {
         rows={rows}
         currency={currency}
       >
-        <BarChart data={[...rows]} margin={{ bottom: 20 }}>
+        <BarChart data={[...rows]} margin={{ bottom: 20 }} accessibilityLayer={false}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" />
           <XAxis dataKey="label" angle={X_AXIS_LABEL_ANGLE} textAnchor="end" height={X_AXIS_HEIGHT} tick={AXIS_TICK} />
           <YAxis tickFormatter={(value: number) => formatCurrency(value, currency, true)} tick={AXIS_TICK} />

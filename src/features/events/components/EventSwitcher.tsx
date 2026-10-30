@@ -19,7 +19,7 @@ export function EventSwitcher({ current }: { current: CelebrationEvent }) {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger
         className="inline-flex max-w-full items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium shadow-soft transition-colors hover:border-rose"
-        aria-label={`Switch event (current: ${current.name})`}
+        aria-label={`${current.name}: switch event`}
       >
         <span className="truncate">{current.name}</span>
         <ChevronsUpDown className="size-4 shrink-0 text-muted" aria-hidden="true" />
