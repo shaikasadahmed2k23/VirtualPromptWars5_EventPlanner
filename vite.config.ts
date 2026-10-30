@@ -40,13 +40,45 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'shared/**/*.test.ts', 'server/**/*.test.ts', 'build/**/*.test.ts'],
     css: false,
     restoreMocks: true,
     // Full wizard journeys drive many steps through real lazy-loaded routes.
     testTimeout: 30_000,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          setupFiles: [],
+          include: [
+            'server/**/*.test.ts',
+            'shared/**/*.test.ts',
+            'build/**/*.test.ts',
+            'src/data/**/*.test.ts',
+            'src/features/**/*.test.ts',
+            'src/lib/{collection,format}.test.ts',
+            'src/styles/**/*.test.ts',
+          ],
+          exclude: ['src/features/assistant/lib/assistantLib.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'dom',
+          environment: 'jsdom',
+          setupFiles: ['./src/test/setup.ts'],
+          include: [
+            'src/routes/**/*.test.tsx',
+            'src/features/assistant/lib/assistantLib.test.ts',
+            'src/lib/countdown.test.ts',
+            'src/lib/hooks/**/*.test.ts',
+            'src/lib/storage.test.ts',
+          ],
+        },
+      },
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],

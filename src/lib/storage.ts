@@ -9,6 +9,7 @@ import { logger } from './logger';
  */
 export const safeLocalStorage = {
   getItem(name: string): string | null {
+    if (typeof window === 'undefined') return null;
     try {
       return window.localStorage.getItem(name);
     } catch (error: unknown) {
@@ -17,6 +18,7 @@ export const safeLocalStorage = {
     }
   },
   setItem(name: string, value: string): void {
+    if (typeof window === 'undefined') return;
     try {
       window.localStorage.setItem(name, value);
     } catch (error: unknown) {
@@ -24,6 +26,7 @@ export const safeLocalStorage = {
     }
   },
   removeItem(name: string): void {
+    if (typeof window === 'undefined') return;
     try {
       window.localStorage.removeItem(name);
     } catch (error: unknown) {
