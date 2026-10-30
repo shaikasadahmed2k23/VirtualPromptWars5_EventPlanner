@@ -27,9 +27,14 @@ vi.mock('framer-motion', () => ({
 await Promise.all([
   import('@/routes/AssistantPage'),
   import('@/routes/DashboardPage'),
+  import('@/routes/BudgetPage'),
+  import('@/routes/GuestsPage'),
   import('@/routes/LandingPage'),
   import('@/routes/PlanWizardPage'),
+  import('@/routes/TasksPage'),
   import('@/routes/ThemesPage'),
+  import('@/routes/VendorsPage'),
+  import('@/features/budget/components/BudgetCharts'),
 ]);
 
 // Lazy route chunks are transformed on first import; under a parallel run this can
