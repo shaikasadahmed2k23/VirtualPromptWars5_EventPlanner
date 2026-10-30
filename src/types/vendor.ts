@@ -23,7 +23,7 @@ export interface Vendor {
   currency: CurrencyCode;
   description: string;
   tags: string[];
-  /** Key into the curated photo registry. */
+  /** Unsplash id of a curated photo; resolve with `photoById`. */
   photoId: string;
   email: string;
   phone: string;

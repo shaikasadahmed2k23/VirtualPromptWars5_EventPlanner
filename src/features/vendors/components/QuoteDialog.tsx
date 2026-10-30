@@ -1,46 +1,65 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactElement } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
+import { FormDialog } from '@/components/ui/form-dialog';
 import { Input, Textarea } from '@/components/ui/input';
-import { useVendorStore } from '../store/useVendorStore';
+import { useDialogForm } from '@/lib/hooks/useDialogForm';
+import type { CelebrationEvent, Vendor } from '@/types';
 import { quoteRequestSchema, type QuoteRequestInput } from '../lib/vendorValidation';
-import type { Vendor } from '@/types';
+import { useVendorStore } from '../store/useVendorStore';
 
-const INITIAL: QuoteRequestInput = { name: '', email: '', eventDate: '', message: '' };
+interface QuoteDialogProps {
+  vendor: Vendor;
+  /** The event being planned; pre-fills the date and guest count. */
+  event: CelebrationEvent | undefined;
+  trigger: ReactElement;
+}
 
-/** Local-only request-a-quote dialog for a vendor. */
-export function QuoteDialog({ vendor, eventId, children }: { vendor: Vendor; eventId: string | null; children: ReactNode }) {
-  const submit = useVendorStore((state) => state.submitQuoteRequest);
-  const [open, setOpen] = useState(false);
-  const [values, setValues] = useState(INITIAL);
-  const [errors, setErrors] = useState<Partial<Record<keyof QuoteRequestInput, string>>>({});
-  const set = (key: keyof QuoteRequestInput, value: string) => setValues((current) => ({ ...current, [key]: value }));
-  const handleSubmit = () => {
-    const result = quoteRequestSchema.safeParse(values);
-    if (!result.success) {
-      const nextErrors: Partial<Record<keyof QuoteRequestInput, string>> = {};
-      result.error.issues.forEach((issue) => {
-        const key = issue.path[0];
-        if (typeof key === 'string' && key in INITIAL) nextErrors[key as keyof QuoteRequestInput] = issue.message;
-      });
-      setErrors(nextErrors);
-      return;
-    }
-    submit({ ...result.data, vendorId: vendor.id, eventId, guestCount: 0 });
-    setOpen(false);
-    setValues(INITIAL);
-    setErrors({});
-    toast.success('Quote request saved locally', { description: 'Demo only — nothing was sent.' });
-  };
-  return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild>{children}</DialogTrigger><DialogContent title={`Request a quote from ${vendor.name}`} description="Demo only. This request is saved on this device and nothing is sent.">
-    <div className="space-y-4">
-      <Field label="Your name" required error={errors.name}>{(props) => <Input {...props} value={values.name} onChange={(event) => set('name', event.target.value)} />}</Field>
-      <Field label="Email" required error={errors.email}>{(props) => <Input {...props} type="email" value={values.email} onChange={(event) => set('email', event.target.value)} />}</Field>
-      <Field label="Event date" required error={errors.eventDate}>{(props) => <Input {...props} type="date" value={values.eventDate} onChange={(event) => set('eventDate', event.target.value)} />}</Field>
-      <Field label="Message" required error={errors.message}>{(props) => <Textarea {...props} value={values.message} onChange={(event) => set('message', event.target.value)} />}</Field>
-      <Button onClick={handleSubmit}>Save request</Button>
-    </div>
-  </DialogContent></Dialog>;
+/** Request-a-quote form. Demo only: the request is stored on this device and never sent. */
+export function QuoteDialog({ vendor, event, trigger }: QuoteDialogProps) {
+  const submitQuoteRequest = useVendorStore((state) => state.submitQuoteRequest);
+  const { form, open, onOpenChange, submitWith } = useDialogForm(quoteRequestSchema, (): QuoteRequestInput => ({
+    name: '',
+    email: '',
+    eventDate: event?.date ?? '',
+    guestCount: event?.guestCount ?? 0,
+    message: '',
+  }));
+  const {
+    register,
+    formState: { errors },
+  } = form;
+
+  return (
+    <FormDialog
+      trigger={trigger}
+      title={`Request a quote from ${vendor.name}`}
+      description="Demo only. The request is saved on this device; nothing is sent to the vendor."
+      submitLabel="Save request"
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={submitWith((values) => {
+        submitQuoteRequest({ ...values, vendorId: vendor.id, eventId: event?.id ?? null });
+        toast.success('Quote request saved on this device', { description: 'Demo only. Nothing was sent.' });
+      })}
+    >
+      <Field label="Your name" required error={errors.name?.message}>
+        {(props) => <Input {...props} autoComplete="name" {...register('name')} />}
+      </Field>
+      <Field label="Email" required error={errors.email?.message}>
+        {(props) => <Input {...props} type="email" autoComplete="email" {...register('email')} />}
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Event date" required error={errors.eventDate?.message}>
+          {(props) => <Input {...props} type="date" {...register('eventDate')} />}
+        </Field>
+        <Field label="Guests" required error={errors.guestCount?.message}>
+          {(props) => <Input {...props} type="number" min={1} {...register('guestCount', { valueAsNumber: true })} />}
+        </Field>
+      </div>
+      <Field label="Message" required error={errors.message?.message}>
+        {(props) => <Textarea {...props} {...register('message')} />}
+      </Field>
+    </FormDialog>
+  );
 }

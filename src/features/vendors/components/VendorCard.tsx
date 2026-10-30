@@ -1,36 +1,125 @@
 import { Heart, Mail, Phone, Star } from 'lucide-react';
+import { memo, useId } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Photo } from '@/components/ui/photo';
+import { PHOTOS, photoById } from '@/data/photos';
 import { VENDOR_CATEGORY_LABELS } from '@/lib/labels';
-import { PHOTOS } from '@/data/photos';
-import type { Vendor, VendorCategory } from '@/types';
+import { PRICE_TIERS, type CelebrationEvent, type Vendor } from '@/types';
+import { priceTierLabel } from '../lib/vendorFilters';
 import { QuoteDialog } from './QuoteDialog';
+import { VendorDetailsDialog } from './VendorDetailsDialog';
 
-function price(tier: number) { return '₹'.repeat(tier); }
-function photoFor(vendor: Vendor) {
-  return Object.values(PHOTOS).find((photo) => photo.id === vendor.photoId) ?? PHOTOS.mandapHall;
-}
-const GALLERY: Record<VendorCategory, readonly (keyof typeof PHOTOS)[]> = {
-  venue: ['mandapHall', 'banquetHall', 'gardenGazebo'],
-  photographer: ['vintageCamera', 'holdingHands', 'confettiKiss'],
-  caterer: ['cateringBuffet', 'grazingPlatter', 'platedDinner'],
-  decorator: ['floralTable', 'wildflowerTable', 'tentCentrepieces'],
-  entertainer: ['concertGlow', 'djBooth', 'pinkStage'],
-};
+const CARD_PHOTO_ASPECT = 16 / 10;
 
-/** Image-rich vendor listing with detail and contact actions. */
-export function VendorCard({ vendor, shortlisted, onShortlist, onAddToBudget, eventId }: { vendor: Vendor; shortlisted: boolean; onShortlist: () => void; onAddToBudget: () => void; eventId: string | null }) {
-  return <Card className="group overflow-hidden transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift">
-    <Dialog><DialogTrigger asChild><button type="button" className="block w-full text-left"><Photo photo={photoFor(vendor)} aspect={16 / 10} sizes="(min-width: 1024px) 30vw, 100vw" /><span className="sr-only">View details for {vendor.name}</span></button></DialogTrigger>
-      <DialogContent title={vendor.name} description={vendor.description} className="max-w-2xl"><div className="grid grid-cols-3 gap-2">{GALLERY[vendor.category].map((key, index) => <Photo key={key} photo={PHOTOS[key]} aspect={index === 0 ? 16 / 9 : 1} className={index === 0 ? 'col-span-3' : ''} />)}</div><div className="mt-4 grid gap-3 sm:grid-cols-2"><p><strong>Category:</strong> {VENDOR_CATEGORY_LABELS[vendor.category]}</p><p><strong>Location:</strong> {vendor.city}</p><p><strong>Price:</strong> {price(vendor.priceTier)}</p><p><strong>Starting at:</strong> ₹{vendor.startingPrice.toLocaleString('en-IN')}</p><p><strong>Contact:</strong> {vendor.email}</p><p><strong>Phone:</strong> {vendor.phone}</p></div><div className="mt-3 flex flex-wrap gap-2">{vendor.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}</div></DialogContent>
-    </Dialog>
-    <div className="space-y-3 p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wide text-rose-ink">{VENDOR_CATEGORY_LABELS[vendor.category]}</p><h2 className="mt-1 text-xl">{vendor.name}</h2><p className="text-sm text-muted">{vendor.city} · {price(vendor.priceTier)}</p></div><Button variant="ghost" size="icon-sm" aria-label={`${shortlisted ? 'Remove' : 'Add'} ${vendor.name} ${shortlisted ? 'from' : 'to'} shortlist`} aria-pressed={shortlisted} onClick={onShortlist}><Heart aria-hidden="true" fill={shortlisted ? 'currentColor' : 'none'} /></Button></div>
-      <p className="text-sm text-muted">{vendor.description}</p><div className="flex items-center gap-1 text-sm"><Star className="size-4 fill-gold text-gold-ink" aria-hidden="true" /><span aria-label={`${vendor.rating} out of 5`}>{vendor.rating} out of 5</span><span className="text-muted">({vendor.reviewCount})</span></div>
-      <div className="flex flex-wrap gap-2">{vendor.tags.map((tag) => <Badge key={tag} tone="neutral">{tag}</Badge>)}</div>
-      <div className="flex flex-wrap gap-2 pt-1"><Button size="sm" onClick={onAddToBudget}>Add to budget</Button><QuoteDialog vendor={vendor} eventId={eventId}><Button size="sm" variant="secondary">Request quote</Button></QuoteDialog><a className="inline-flex size-9 items-center justify-center rounded-full text-muted hover:bg-ivory-deep hover:text-rose-ink" href={`mailto:${vendor.email}`} aria-label={`Email ${vendor.name}`}><Mail aria-hidden="true" /></a><a className="inline-flex size-9 items-center justify-center rounded-full text-muted hover:bg-ivory-deep hover:text-rose-ink" href={`tel:${vendor.phone}`} aria-label={`Call ${vendor.name}`}><Phone aria-hidden="true" /></a></div>
-    </div>
-  </Card>;
+interface VendorCardProps {
+  vendor: Vendor;
+  shortlisted: boolean;
+  /** The event being planned, used for "Add to budget" and quote pre-fill. */
+  event: CelebrationEvent | undefined;
+  onToggleShortlist: (vendor: Vendor) => void;
+  onAddToBudget: (vendor: Vendor) => void;
 }
+
+/** Directory listing: photo (opens details), rating, tags and planning actions. */
+export const VendorCard = memo(function VendorCard({
+  vendor,
+  shortlisted,
+  event,
+  onToggleShortlist,
+  onAddToBudget,
+}: VendorCardProps) {
+  const headingId = useId();
+  const photo = photoById(vendor.photoId) ?? PHOTOS.mandapHall;
+
+  return (
+    <article
+      aria-labelledby={headingId}
+      className="overflow-hidden rounded-2xl border border-line bg-surface shadow-soft transition-transform duration-200 hover:-translate-y-1 hover:shadow-lift motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+    >
+      <VendorDetailsDialog
+        vendor={vendor}
+        trigger={
+          <button type="button" className="block w-full text-left" aria-label={`View details for ${vendor.name}`}>
+            <Photo
+              photo={photo}
+              aspect={CARD_PHOTO_ASPECT}
+              sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 100vw"
+            />
+          </button>
+        }
+      />
+      <div className="space-y-3 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-rose-ink">
+              {VENDOR_CATEGORY_LABELS[vendor.category]}
+            </p>
+            <h2 id={headingId} className="mt-1 text-xl">
+              {vendor.name}
+            </h2>
+            <p className="text-sm text-muted">
+              {vendor.city} · <span aria-hidden="true">{priceTierLabel(vendor.priceTier)}</span>
+              <span className="sr-only">
+                price level {vendor.priceTier} of {PRICE_TIERS.length}
+              </span>
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={shortlisted ? `Remove ${vendor.name} from shortlist` : `Add ${vendor.name} to shortlist`}
+            aria-pressed={shortlisted}
+            onClick={() => {
+              onToggleShortlist(vendor);
+            }}
+          >
+            <Heart aria-hidden="true" fill={shortlisted ? 'currentColor' : 'none'} />
+          </Button>
+        </div>
+        <p className="text-sm text-muted">{vendor.description}</p>
+        <p className="flex items-center gap-1 text-sm">
+          <Star className="size-4 fill-gold text-gold-ink" aria-hidden="true" />
+          {vendor.rating} out of 5<span className="text-muted">({vendor.reviewCount} reviews)</span>
+        </p>
+        <ul className="flex flex-wrap gap-2" aria-label="Specialities">
+          {vendor.tags.map((tag) => (
+            <li key={tag}>
+              <Badge tone="neutral">{tag}</Badge>
+            </li>
+          ))}
+        </ul>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button
+            size="sm"
+            disabled={!event}
+            onClick={() => {
+              onAddToBudget(vendor);
+            }}
+          >
+            Add to budget
+          </Button>
+          <QuoteDialog
+            vendor={vendor}
+            event={event}
+            trigger={
+              <Button size="sm" variant="secondary">
+                Request quote
+              </Button>
+            }
+          />
+          <Button asChild variant="ghost" size="icon-sm">
+            <a href={`mailto:${vendor.email}`} aria-label={`Email ${vendor.name}`}>
+              <Mail aria-hidden="true" />
+            </a>
+          </Button>
+          <Button asChild variant="ghost" size="icon-sm">
+            <a href={`tel:${vendor.phone.replaceAll(' ', '')}`} aria-label={`Call ${vendor.name}`}>
+              <Phone aria-hidden="true" />
+            </a>
+          </Button>
+        </div>
+      </div>
+    </article>
+  );
+});

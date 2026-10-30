@@ -1,3 +1,4 @@
+import compression from 'compression';
 import express, { type Express } from 'express';
 import { LIMITS } from '../shared/limits.js';
 import type { ServerConfig } from './config.js';
@@ -26,6 +27,8 @@ export function createApp({ config, aiService, logger, serveStatic = false }: Ap
   app.set('trust proxy', 1);
 
   app.use(securityHeaders());
+  // gzip/brotli-negotiated compression for API JSON and static assets alike.
+  app.use(compression());
   app.use(
     '/api',
     originGuard(config.allowedOrigins),

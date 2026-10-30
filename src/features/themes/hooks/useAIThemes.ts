@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { toast } from 'sonner';
+import { notifyWithUndo } from '@/lib/undoToast';
 import { requestThemes } from '@/features/assistant/lib/aiRequests';
 import { toEventBrief } from '@/features/assistant/lib/toEventBrief';
 import { useAssistantStore } from '@/features/assistant/store/useAssistantStore';
@@ -31,16 +31,14 @@ export function useAIThemes(event: CelebrationEvent) {
     (theme: ThemeSuggestion) => {
       const previous = event.theme;
       saveTheme(event.id, theme);
-      toast.success(`“${theme.name}” is now your theme`, {
-        description: 'Your dashboard has been updated.',
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            if (previous) saveTheme(event.id, previous);
-            else clearTheme(event.id);
-          },
+      notifyWithUndo(
+        `“${theme.name}” is now your theme`,
+        () => {
+          if (previous) saveTheme(event.id, previous);
+          else clearTheme(event.id);
         },
-      });
+        'Your dashboard has been updated.',
+      );
     },
     [clearTheme, event.id, event.theme, saveTheme],
   );

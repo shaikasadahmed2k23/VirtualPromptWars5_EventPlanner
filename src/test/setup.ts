@@ -10,7 +10,13 @@ interface MotionElementProps extends HTMLAttributes<HTMLDivElement> {
   transition?: unknown;
 }
 
-function MotionDiv({ animate: _animate, exit: _exit, initial: _initial, transition: _transition, ...props }: MotionElementProps) {
+function MotionDiv({
+  animate: _animate,
+  exit: _exit,
+  initial: _initial,
+  transition: _transition,
+  ...props
+}: MotionElementProps) {
   return createElement('div', props);
 }
 
@@ -24,6 +30,8 @@ vi.mock('framer-motion', () => ({
   motion: { div: MotionDiv },
 }));
 
+// Transform every lazy route module once per worker up front. Otherwise the first render of each
+// route pays Vite's on-demand transform inside a `findBy` timeout, which made page tests flaky.
 await Promise.all([
   import('@/routes/AssistantPage'),
   import('@/routes/DashboardPage'),
@@ -57,6 +65,11 @@ if (typeof window !== 'undefined') {
       }),
     });
   }
+  // jsdom has no pointer capture; Sonner's swipe-to-dismiss calls it when a toast button is pressed.
+  const elementProto: Partial<Element> = Element.prototype;
+  elementProto.setPointerCapture ??= () => undefined;
+  elementProto.releasePointerCapture ??= () => undefined;
+  elementProto.hasPointerCapture ??= () => false;
   // jsdom does not implement scrolling; route focus management calls it.
   window.scrollTo = () => undefined;
   // jsdom has no canvas; axe-core probes it and handles a null context.

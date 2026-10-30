@@ -16,7 +16,9 @@ describe('GuestsPage', () => {
     const before = useGuestStore.getState().guests.filter((guest) => guest.rsvp === 'attending').length;
     const select = screen.getByRole('combobox', { name: /rsvp for sameer qureshi/i });
     await user.selectOptions(select, 'attending');
-    await waitFor(() => expect(useGuestStore.getState().guests.filter((guest) => guest.rsvp === 'attending')).toHaveLength(before + 1));
+    await waitFor(() =>
+      expect(useGuestStore.getState().guests.filter((guest) => guest.rsvp === 'attending')).toHaveLength(before + 1),
+    );
     expect(screen.getByText(String(before + 1))).toBeInTheDocument();
   });
 
@@ -24,8 +26,12 @@ describe('GuestsPage', () => {
     const { user } = renderRoute(`/events/${DEMO_EVENT_ID}/guests`);
     await screen.findByRole('heading', { level: 1, name: 'Guests' });
     await user.click(screen.getByRole('checkbox', { name: /select all visible/i }));
-    await user.selectOptions(screen.getByRole('combobox', { name: /bulk rsvp/i }), 'declined');
+    await user.selectOptions(screen.getByRole('combobox', { name: /set rsvp for selected/i }), 'declined');
+    // Choosing an option alone never edits guests; "Apply" does.
+    expect(useGuestStore.getState().guests.some((guest) => guest.rsvp !== 'declined')).toBe(true);
+    await user.click(screen.getByRole('button', { name: 'Apply' }));
     expect(useGuestStore.getState().guests.filter((guest) => guest.rsvp === 'declined')).toHaveLength(22);
+    expect(screen.getByRole('checkbox', { name: /select all visible/i })).not.toBeChecked();
   });
 
   it('adds, validates, deletes and restores a guest with Undo', async () => {

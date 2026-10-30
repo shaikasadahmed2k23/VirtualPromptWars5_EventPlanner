@@ -83,6 +83,13 @@ export const PHOTOS = {
 
 export type PhotoKey = keyof typeof PHOTOS;
 
+const PHOTOS_BY_ID: ReadonlyMap<string, Photo> = new Map(Object.values(PHOTOS).map((photo) => [photo.id, photo]));
+
+/** Looks up a curated photo by its Unsplash id (as stored on seed records). */
+export function photoById(id: string): Photo | undefined {
+  return PHOTOS_BY_ID.get(id);
+}
+
 /** Curated mood-board imagery for each AI theme mood. */
 export const MOOD_PHOTOS: Record<ThemeMood, readonly PhotoKey[]> = {
   floral: ['lushBouquet', 'peachBouquet', 'ringsOnRoses', 'ceremonyAisle'],

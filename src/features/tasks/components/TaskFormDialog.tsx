@@ -1,100 +1,85 @@
-import { useState, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { TASK_CATEGORIES, TASK_PRIORITIES } from '@shared/domain';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
+import { FormDialog } from '@/components/ui/form-dialog';
 import { Input, Select, Textarea } from '@/components/ui/input';
+import { useDialogForm } from '@/lib/hooks/useDialogForm';
 import { TASK_CATEGORY_LABELS, TASK_PRIORITY_LABELS } from '@/lib/labels';
-import type { Task, TaskInput } from '@/types';
+import type { Id, Task, TaskInput } from '@/types';
 import { taskInputSchema } from '../lib/taskValidation';
 import { useTaskStore } from '../store/useTaskStore';
 
-const EMPTY_TASK: TaskInput = {
-  title: '',
-  notes: '',
-  dueDate: '',
-  priority: 'medium',
-  category: 'other',
-};
+const EMPTY_TASK: TaskInput = { title: '', notes: '', dueDate: '', priority: 'medium', category: 'other' };
+
+function toTaskInput({ title, notes, dueDate, priority, category }: Task): TaskInput {
+  return { title, notes, dueDate, priority, category };
+}
 
 interface TaskFormDialogProps {
-  eventId: string;
+  eventId: Id;
+  /** Task to edit; omit to create a new one. */
   task?: Task;
   trigger: ReactElement;
 }
 
-/** Accessible dialog for creating or editing a validated checklist task. */
+/** Dialog for creating or editing a validated checklist task. */
 export function TaskFormDialog({ eventId, task, trigger }: TaskFormDialogProps) {
   const addTask = useTaskStore((state) => state.addTask);
   const updateTask = useTaskStore((state) => state.updateTask);
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<TaskInput>(task ?? EMPTY_TASK);
-  const [error, setError] = useState<string>();
-  const update = <K extends keyof TaskInput>(key: K, value: TaskInput[K]) =>
-    setDraft((current) => ({ ...current, [key]: value }));
-
-  const submit = () => {
-    const result = taskInputSchema.safeParse(draft);
-    if (!result.success) {
-      setError(result.error.issues[0]?.message ?? 'Check the task details.');
-      return;
-    }
-    if (task) updateTask(task.id, result.data);
-    else addTask(eventId, result.data);
-    setError(undefined);
-    setOpen(false);
-  };
+  const { form, open, onOpenChange, submitWith } = useDialogForm(taskInputSchema, () =>
+    task ? toTaskInput(task) : EMPTY_TASK,
+  );
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
-    <Dialog
+    <FormDialog
+      trigger={trigger}
+      title={task ? 'Edit task' : 'Add task'}
+      description="Keep one clear next step on your checklist."
+      submitLabel={task ? 'Save task' : 'Add task'}
       open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen);
-        if (nextOpen) setDraft(task ?? EMPTY_TASK);
-      }}
+      onOpenChange={onOpenChange}
+      onSubmit={submitWith((values) => {
+        if (task) updateTask(task.id, values);
+        else addTask(eventId, values);
+      })}
     >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent title={task ? 'Edit task' : 'Add task'} description="Keep one clear next step on your checklist.">
-        <div className="grid gap-4">
-          <Field label="Title" required error={error}>
-            {(props) => <Input {...props} value={draft.title} onChange={(event) => update('title', event.target.value)} />}
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Deadline" required>
-              {(props) => <Input {...props} type="date" value={draft.dueDate} onChange={(event) => update('dueDate', event.target.value)} />}
-            </Field>
-            <Field label="Priority" required>
-              {(props) => (
-                <Select {...props} value={draft.priority} onChange={(event) => update('priority', event.target.value as TaskInput['priority'])}>
-                  {TASK_PRIORITIES.map((priority) => (
-                    <option key={priority} value={priority}>
-                      {TASK_PRIORITY_LABELS[priority]}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-          </div>
-          <Field label="Category" required>
-            {(props) => (
-              <Select {...props} value={draft.category} onChange={(event) => update('category', event.target.value as TaskInput['category'])}>
-                {TASK_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {TASK_CATEGORY_LABELS[category]}
-                  </option>
-                ))}
-              </Select>
-            )}
-          </Field>
-          <Field label="Notes">
-            {(props) => <Textarea {...props} value={draft.notes} onChange={(event) => update('notes', event.target.value)} />}
-          </Field>
-          <div className="flex justify-end gap-3">
-            <DialogClose asChild><Button variant="secondary">Cancel</Button></DialogClose>
-            <Button onClick={submit}>{task ? 'Save task' : 'Add task'}</Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+      <Field label="Title" required error={errors.title?.message}>
+        {(props) => <Input {...props} {...register('title')} />}
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Deadline" required error={errors.dueDate?.message}>
+          {(props) => <Input {...props} type="date" {...register('dueDate')} />}
+        </Field>
+        <Field label="Priority" required>
+          {(props) => (
+            <Select {...props} {...register('priority')}>
+              {TASK_PRIORITIES.map((priority) => (
+                <option key={priority} value={priority}>
+                  {TASK_PRIORITY_LABELS[priority]}
+                </option>
+              ))}
+            </Select>
+          )}
+        </Field>
+      </div>
+      <Field label="Category" required>
+        {(props) => (
+          <Select {...props} {...register('category')}>
+            {TASK_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {TASK_CATEGORY_LABELS[category]}
+              </option>
+            ))}
+          </Select>
+        )}
+      </Field>
+      <Field label="Notes" error={errors.notes?.message}>
+        {(props) => <Textarea {...props} {...register('notes')} />}
+      </Field>
+    </FormDialog>
   );
 }

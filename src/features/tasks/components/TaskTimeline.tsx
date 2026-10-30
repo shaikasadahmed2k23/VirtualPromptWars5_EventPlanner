@@ -1,4 +1,5 @@
 import { CalendarDays, CheckCircle2 } from 'lucide-react';
+import { useId, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatTaskDeadline, groupTasksByTimeline } from '../lib/taskTimeline';
@@ -14,15 +15,21 @@ interface TaskTimelineProps {
 
 /** Vertical, keyboard-accessible timeline grouped around the event date. */
 export function TaskTimeline({ tasks, eventDate, onToggle }: TaskTimelineProps) {
-  const groups = groupTasksByTimeline(tasks, eventDate);
+  const groups = useMemo(() => groupTasksByTimeline(tasks, eventDate), [tasks, eventDate]);
+  const idPrefix = useId();
   return (
     <div className="space-y-6">
-      {groups.map((bucket) => (
-        <section key={bucket.group} aria-labelledby={`timeline-${bucket.group}`}>
+      {groups.map((bucket, index) => (
+        <section key={bucket.group} aria-labelledby={`${idPrefix}-${String(index)}`}>
           <div className="mb-3 flex items-center gap-2">
             <CalendarDays className="size-4 text-rose-ink" aria-hidden="true" />
-            <h2 id={`timeline-${bucket.group}`} className="font-serif text-xl font-semibold">{bucket.group}</h2>
-            <Badge>{bucket.tasks.length}</Badge>
+            <h2 id={`${idPrefix}-${String(index)}`} className="font-serif text-xl font-semibold">
+              {bucket.group}
+            </h2>
+            <Badge>
+              {bucket.tasks.length}
+              <span className="sr-only"> tasks</span>
+            </Badge>
           </div>
           {bucket.tasks.length === 0 ? (
             <p className="border-l-2 border-line py-2 pl-6 text-sm text-muted">No tasks in this window.</p>
@@ -34,9 +41,15 @@ export function TaskTimeline({ tasks, eventDate, onToggle }: TaskTimelineProps) 
                     <CheckCircle2 className="size-4" aria-hidden="true" />
                   </span>
                   <div className="flex items-start gap-3">
-                    <Checkbox checked={task.done} onCheckedChange={() => onToggle(task)} aria-label={`Mark ${task.title} ${task.done ? 'open' : 'done'}`} />
+                    <Checkbox
+                      checked={task.done}
+                      onCheckedChange={() => onToggle(task)}
+                      aria-label={`Mark ${task.title} ${task.done ? 'open' : 'done'}`}
+                    />
                     <div className="min-w-0 flex-1">
-                      <h3 className={task.done ? 'font-medium text-muted line-through' : 'font-medium'}>{task.title}</h3>
+                      <h3 className={task.done ? 'font-medium text-muted line-through' : 'font-medium'}>
+                        {task.title}
+                      </h3>
                       <p className="mt-1 text-sm text-muted">
                         {formatTaskDeadline(task.dueDate)} · {TASK_CATEGORY_LABELS[task.category]}
                       </p>

@@ -1,14 +1,14 @@
-import { useRef, useState } from 'react';
+import { Plus } from 'lucide-react';
 import { BUDGET_CATEGORIES } from '@shared/domain';
-import { LIMITS } from '@shared/limits';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
+import { FormDialog } from '@/components/ui/form-dialog';
 import { Input, Select, Textarea } from '@/components/ui/input';
-import { useBudgetStore } from '../store/useBudgetStore';
-import { budgetItemSchema } from '../lib/budgetValidation';
+import { useDialogForm } from '@/lib/hooks/useDialogForm';
 import { BUDGET_CATEGORY_LABELS } from '@/lib/labels';
-import type { BudgetItemInput } from '@/types';
+import type { BudgetItemInput, Id } from '@/types';
+import { budgetItemSchema } from '../lib/budgetValidation';
+import { useBudgetStore } from '../store/useBudgetStore';
 
 const EMPTY_ITEM: BudgetItemInput = {
   category: 'venue',
@@ -21,72 +21,62 @@ const EMPTY_ITEM: BudgetItemInput = {
   source: 'manual',
 };
 
-/** Dialog for adding a validated budget line. */
-export function BudgetEntryForm({ eventId }: { eventId: string }) {
+/** "Add expense" button and dialog for a validated budget line. */
+export function BudgetEntryForm({ eventId }: { eventId: Id }) {
   const addItem = useBudgetStore((state) => state.addItem);
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<BudgetItemInput>(EMPTY_ITEM);
-  const [error, setError] = useState<string>();
-  const submitting = useRef(false);
-  const update = <K extends keyof BudgetItemInput>(key: K, value: BudgetItemInput[K]) =>
-    setDraft((current) => ({ ...current, [key]: value }));
-
-  const submit = () => {
-    if (submitting.current) return;
-    submitting.current = true;
-    const result = budgetItemSchema.safeParse(draft);
-    if (!result.success) {
-      setError(result.error.issues[0]?.message ?? 'Check the budget line details.');
-      submitting.current = false;
-      return;
-    }
-    addItem(eventId, result.data);
-    setDraft(EMPTY_ITEM);
-    setError(undefined);
-    setOpen(false);
-    submitting.current = false;
-  };
+  const { form, open, onOpenChange, submitWith } = useDialogForm(budgetItemSchema, () => EMPTY_ITEM);
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Add expense</Button>
-      </DialogTrigger>
-      <DialogContent title="Add budget line" description="Capture an estimated and actual amount for this expense.">
-        <div className="grid gap-4">
-          <Field label="Name" required error={error}>
-            {(props) => <Input {...props} value={draft.name} onChange={(event) => update('name', event.target.value)} />}
-          </Field>
-          <Field label="Category" required>
-            {(props) => (
-              <Select {...props} value={draft.category} onChange={(event) => update('category', event.target.value as BudgetItemInput['category'])}>
-                {BUDGET_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {BUDGET_CATEGORY_LABELS[category]}
-                  </option>
-                ))}
-              </Select>
-            )}
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Estimated" required hint={`Maximum ${LIMITS.budgetMax.toLocaleString('en-IN')}`}>
-              {(props) => <Input {...props} type="number" min={0} value={draft.estimated} onChange={(event) => update('estimated', Number(event.target.value))} />}
-            </Field>
-            <Field label="Actual" required>
-              {(props) => <Input {...props} type="number" min={0} value={draft.actual} onChange={(event) => update('actual', Number(event.target.value))} />}
-            </Field>
-          </div>
-          <Field label="Notes">
-            {(props) => <Textarea {...props} value={draft.notes} onChange={(event) => update('notes', event.target.value)} />}
-          </Field>
-          <div className="flex justify-end gap-3">
-            <DialogClose asChild>
-              <Button variant="secondary">Cancel</Button>
-            </DialogClose>
-            <Button onClick={submit}>Add expense</Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <FormDialog
+      trigger={
+        <Button>
+          <Plus aria-hidden="true" />
+          Add expense
+        </Button>
+      }
+      title="Add expense"
+      description="Capture an estimated and actual amount for this expense."
+      submitLabel="Add expense"
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={submitWith((values) => {
+        addItem(eventId, values);
+      })}
+    >
+      <Field label="Name" required error={errors.name?.message}>
+        {(props) => <Input {...props} {...register('name')} />}
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Category" required>
+          {(props) => (
+            <Select {...props} {...register('category')}>
+              {BUDGET_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {BUDGET_CATEGORY_LABELS[category]}
+                </option>
+              ))}
+            </Select>
+          )}
+        </Field>
+        <Field label="Vendor" error={errors.vendorName?.message}>
+          {(props) => <Input {...props} {...register('vendorName')} />}
+        </Field>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Estimated" required error={errors.estimated?.message}>
+          {(props) => <Input {...props} type="number" min={0} {...register('estimated', { valueAsNumber: true })} />}
+        </Field>
+        <Field label="Actual" required error={errors.actual?.message}>
+          {(props) => <Input {...props} type="number" min={0} {...register('actual', { valueAsNumber: true })} />}
+        </Field>
+      </div>
+      <Field label="Notes" error={errors.notes?.message}>
+        {(props) => <Textarea {...props} {...register('notes')} />}
+      </Field>
+    </FormDialog>
   );
 }

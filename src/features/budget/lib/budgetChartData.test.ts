@@ -15,13 +15,17 @@ const item = (overrides: Partial<BudgetItem>): BudgetItem => ({
 });
 
 describe('toBudgetChartData', () => {
-  it('falls back to estimated spend when actual is zero', () => {
+  it('keeps actual spend truthful and forecasts from the estimate when nothing is spent', () => {
     const data = toBudgetChartData(computeBudgetSummary([item({})], 500));
-    expect(data).toEqual([{ category: 'venue', label: 'Venue', estimated: 100, actual: 100 }]);
+    expect(data).toEqual([{ category: 'venue', label: 'Venue', estimated: 100, actual: 0, forecast: 100 }]);
   });
 
-  it('updates chart values from actual spend', () => {
-    const data = toBudgetChartData(computeBudgetSummary([item({ actual: 80 })], 500));
-    expect(data[0]?.actual).toBe(80);
+  it('forecasts from actual spend once it exceeds the estimate', () => {
+    const [row] = toBudgetChartData(computeBudgetSummary([item({ actual: 180 })], 500));
+    expect(row).toMatchObject({ actual: 180, forecast: 180 });
+  });
+
+  it('omits categories with no lines', () => {
+    expect(toBudgetChartData(computeBudgetSummary([], 500))).toEqual([]);
   });
 });

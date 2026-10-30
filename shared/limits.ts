@@ -13,6 +13,7 @@ export const LIMITS = {
   refinementMax: 300,
   guestCountMin: 1,
   guestCountMax: 5000,
+  plusOnesMax: 20,
   budgetMin: 1,
   budgetMax: 1_000_000_000,
   dietaryMaxCount: 6,

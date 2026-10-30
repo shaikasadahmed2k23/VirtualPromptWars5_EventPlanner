@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { toast } from 'sonner';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';
 import { nowISO } from '@/lib/dates';
+import { notifyWithUndo } from '@/lib/undoToast';
 import type { BudgetItemInput, CelebrationEvent, TaskInput } from '@/types';
 import { useAssistantStore } from '../store/useAssistantStore';
 
@@ -20,8 +20,8 @@ export function usePlanActions(event: CelebrationEvent) {
   const addToChecklist = useCallback(
     (input: TaskInput) => {
       const task = addTask(event.id, input, 'ai');
-      toast.success(`Added “${input.title}” to your checklist`, {
-        action: { label: 'Undo', onClick: () => deleteTask(task.id) },
+      notifyWithUndo(`Added “${input.title}” to your checklist`, () => {
+        deleteTask(task.id);
       });
     },
     [addTask, deleteTask, event.id],
@@ -30,8 +30,8 @@ export function usePlanActions(event: CelebrationEvent) {
   const addToBudget = useCallback(
     (input: BudgetItemInput) => {
       const item = addItem(event.id, { ...input, source: 'ai' });
-      toast.success(`Added “${input.name}” to your budget`, {
-        action: { label: 'Undo', onClick: () => deleteItem(item.id) },
+      notifyWithUndo(`Added “${input.name}” to your budget`, () => {
+        deleteItem(item.id);
       });
     },
     [addItem, deleteItem, event.id],
@@ -40,10 +40,13 @@ export function usePlanActions(event: CelebrationEvent) {
   const savePlan = useCallback(() => {
     const previous = useAssistantStore.getState().plans[event.id]?.savedAt ?? null;
     setSavedAt(event.id, nowISO());
-    toast.success('Plan saved to your event', {
-      description: 'Your dashboard now shows it as your chosen plan.',
-      action: { label: 'Undo', onClick: () => setSavedAt(event.id, previous) },
-    });
+    notifyWithUndo(
+      'Plan saved to your event',
+      () => {
+        setSavedAt(event.id, previous);
+      },
+      'Your dashboard now shows it as your chosen plan.',
+    );
   }, [event.id, setSavedAt]);
 
   return { addToChecklist, addToBudget, savePlan };

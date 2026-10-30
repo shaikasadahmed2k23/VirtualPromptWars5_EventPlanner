@@ -1,31 +1,58 @@
-import type { Guest, GuestDietary, GuestGroup, RsvpStatus } from '@/types';
+import { ALL, toFilterOptions, type All, type FilterOption } from '@/lib/filterOptions';
+import { GUEST_DIETARY_LABELS, GUEST_GROUP_LABELS, RSVP_LABELS } from '@/lib/labels';
+import {
+  GUEST_DIETARY,
+  GUEST_GROUPS,
+  RSVP_STATUSES,
+  type Guest,
+  type GuestDietary,
+  type GuestGroup,
+  type RsvpStatus,
+} from '@/types';
 
 export type GuestSort = 'name' | 'rsvp';
-export type GuestRsvpFilter = RsvpStatus | 'all';
-export type GuestGroupFilter = GuestGroup | 'all';
-export type GuestDietaryFilter = GuestDietary | 'all';
 
 export interface GuestFilterOptions {
   search: string;
-  rsvp: GuestRsvpFilter;
-  group: GuestGroupFilter;
-  dietary: GuestDietaryFilter;
+  rsvp: RsvpStatus | All;
+  group: GuestGroup | All;
+  dietary: GuestDietary | All;
   sort: GuestSort;
 }
+
+/** Filters shown when the guest list first opens. */
+export const DEFAULT_GUEST_FILTERS: GuestFilterOptions = {
+  search: '',
+  rsvp: ALL,
+  group: ALL,
+  dietary: ALL,
+  sort: 'name',
+};
+
+/** Options for each guest-list filter control. */
+export const GUEST_FILTER_OPTIONS = {
+  rsvp: toFilterOptions(RSVP_STATUSES, RSVP_LABELS, 'All RSVPs'),
+  group: toFilterOptions(GUEST_GROUPS, GUEST_GROUP_LABELS, 'All groups'),
+  dietary: toFilterOptions(GUEST_DIETARY, GUEST_DIETARY_LABELS, 'All dietary needs'),
+  sort: [
+    { value: 'name', label: 'Name' },
+    { value: 'rsvp', label: 'RSVP' },
+  ] satisfies FilterOption<GuestSort>[],
+};
 
 const RSVP_ORDER: Record<RsvpStatus, number> = { attending: 0, pending: 1, declined: 2 };
 
 /** Filters and sorts guests without mutating the source list. */
 export function filterAndSortGuests(guests: readonly Guest[], options: GuestFilterOptions): Guest[] {
   const search = options.search.trim().toLocaleLowerCase();
-  return [...guests]
+  return guests
     .filter((guest) => {
       const searchable = `${guest.name} ${guest.email} ${guest.phone}`.toLocaleLowerCase();
       return (
         (!search || searchable.includes(search)) &&
-        (options.rsvp === 'all' || guest.rsvp === options.rsvp) &&
-        (options.group === 'all' || guest.group === options.group) &&
-        (options.dietary === 'all' || guest.dietary === options.dietary)
+        (options.rsvp === ALL || guest.rsvp === options.rsvp) &&
+        (options.group === ALL || guest.group === options.group) &&
+        (options.dietary === ALL || guest.dietary === options.dietary)
       );
     })
     .sort((left, right) => {

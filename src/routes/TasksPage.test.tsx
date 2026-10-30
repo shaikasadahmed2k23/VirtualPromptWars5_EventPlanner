@@ -43,7 +43,9 @@ describe('TasksPage', () => {
     expect(await screen.findByText('Removed “Confirm final florist”')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
-    await waitFor(() => expect(useTaskStore.getState().tasks.some((task) => task.title === 'Confirm final florist')).toBe(true));
+    await waitFor(() =>
+      expect(useTaskStore.getState().tasks.some((task) => task.title === 'Confirm final florist')).toBe(true),
+    );
   });
 
   it('generates a starter checklist for an empty event', async () => {

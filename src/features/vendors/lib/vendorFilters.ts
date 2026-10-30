@@ -1,13 +1,61 @@
-import type { Vendor, VendorCategory, PriceTier } from '@/types';
+import { VENDOR_CITIES } from '@/data/seed';
+import { ALL, toFilterOptions, type All, type FilterOption } from '@/lib/filterOptions';
+import { VENDOR_CATEGORY_LABELS } from '@/lib/labels';
+import {
+  PRICE_TIERS,
+  VENDOR_CATEGORIES,
+  type BudgetCategory,
+  type PriceTier,
+  type Vendor,
+  type VendorCategory,
+} from '@/types';
+
+export type VendorSort = 'rating' | 'price';
 
 export interface VendorFilters {
   search: string;
-  category: VendorCategory | 'all';
+  category: VendorCategory | All;
   city: string;
-  priceTier: PriceTier | 'all';
+  priceTier: PriceTier | All;
+  /** Minimum star rating; `0` means any. */
   minRating: number;
-  sort: 'rating' | 'price';
+  sort: VendorSort;
 }
+
+/** Filters shown when the directory first opens. */
+export const DEFAULT_VENDOR_FILTERS: VendorFilters = {
+  search: '',
+  category: ALL,
+  city: ALL,
+  priceTier: ALL,
+  minRating: 0,
+  sort: 'rating',
+};
+
+const RATING_THRESHOLDS = [4, 4.5] as const;
+
+/** Price tier shown as rupee symbols, e.g. tier 3 → "₹₹₹". */
+export function priceTierLabel(tier: PriceTier): string {
+  return '₹'.repeat(tier);
+}
+
+/** Options for each directory filter control. */
+export const VENDOR_FILTER_OPTIONS = {
+  category: toFilterOptions(VENDOR_CATEGORIES, VENDOR_CATEGORY_LABELS, 'All categories'),
+  city: [{ value: ALL, label: 'All cities' }, ...VENDOR_CITIES.map((city) => ({ value: city, label: city }))],
+  priceTier: [
+    { value: ALL, label: 'Any price' },
+    ...PRICE_TIERS.map((tier) => ({ value: tier, label: priceTierLabel(tier) })),
+  ] satisfies FilterOption<PriceTier | All>[],
+  minRating: [
+    { value: 0, label: 'Any rating' },
+    ...RATING_THRESHOLDS.map((rating) => ({ value: rating, label: `${String(rating)}+ stars` })),
+  ] satisfies FilterOption<number>[],
+  sort: [
+    { value: 'rating', label: 'Top rated' },
+    { value: 'price', label: 'Price, low to high' },
+  ] satisfies FilterOption<VendorSort>[],
+};
 
 /** Filters and sorts directory vendors without mutating the source array. */
 export function filterVendors(vendors: readonly Vendor[], filters: VendorFilters): Vendor[] {
@@ -15,22 +63,30 @@ export function filterVendors(vendors: readonly Vendor[], filters: VendorFilters
   return vendors
     .filter((vendor) => {
       const searchable = [vendor.name, vendor.city, vendor.description, ...vendor.tags].join(' ').toLocaleLowerCase();
-      return (!query || searchable.includes(query))
-        && (filters.category === 'all' || vendor.category === filters.category)
-        && (filters.city === 'all' || vendor.city === filters.city)
-        && (filters.priceTier === 'all' || vendor.priceTier === filters.priceTier)
-        && vendor.rating >= filters.minRating;
+      return (
+        (!query || searchable.includes(query)) &&
+        (filters.category === ALL || vendor.category === filters.category) &&
+        (filters.city === ALL || vendor.city === filters.city) &&
+        (filters.priceTier === ALL || vendor.priceTier === filters.priceTier) &&
+        vendor.rating >= filters.minRating
+      );
     })
-    .sort((left, right) => filters.sort === 'rating'
-      ? right.rating - left.rating
-      : left.priceTier - right.priceTier || right.rating - left.rating);
+    .sort((left, right) =>
+      filters.sort === 'rating'
+        ? right.rating - left.rating
+        : left.priceTier - right.priceTier || right.rating - left.rating,
+    );
 }
 
-/** Returns the budget category corresponding to a vendor directory category. */
-export function vendorBudgetCategory(category: VendorCategory): 'venue' | 'catering' | 'decor' | 'photography' | 'entertainment' {
-  if (category === 'caterer') return 'catering';
-  if (category === 'decorator') return 'decor';
-  if (category === 'photographer') return 'photography';
-  if (category === 'entertainer') return 'entertainment';
-  return 'venue';
+const VENDOR_BUDGET_CATEGORY: Record<VendorCategory, BudgetCategory> = {
+  venue: 'venue',
+  photographer: 'photography',
+  caterer: 'catering',
+  decorator: 'decor',
+  entertainer: 'entertainment',
+};
+
+/** The budget category a vendor's quote is tracked under. */
+export function vendorBudgetCategory(category: VendorCategory): BudgetCategory {
+  return VENDOR_BUDGET_CATEGORY[category];
 }

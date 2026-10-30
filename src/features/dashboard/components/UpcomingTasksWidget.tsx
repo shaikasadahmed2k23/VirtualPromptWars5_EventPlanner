@@ -1,6 +1,6 @@
 import { ListChecks, PartyPopper } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { toast } from 'sonner';
+import { notifyWithUndo } from '@/lib/undoToast';
 import { paths } from '@/app/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,8 +24,8 @@ export function UpcomingTasksWidget({ event, isLoading }: { event: CelebrationEv
 
   const complete = (task: Task) => {
     toggleTask(task.id);
-    toast.success(`Marked “${task.title}” done`, {
-      action: { label: 'Undo', onClick: () => toggleTask(task.id) },
+    notifyWithUndo(`Marked “${task.title}” done`, () => {
+      toggleTask(task.id);
     });
   };
 

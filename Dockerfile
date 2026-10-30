@@ -21,4 +21,5 @@ USER node
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider "http://127.0.0.1:${PORT:-8080}/api/health" || exit 1
-CMD ["npm", "run", "start:prod"]
+# Run node directly (not via npm) so SIGTERM reaches the server for a graceful shutdown.
+CMD ["node", "dist-server/server/index.js"]

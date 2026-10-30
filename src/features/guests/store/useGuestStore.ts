@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createSeedGuests } from '@/data/seed';
-import { removeByEventId, removeById, updateById } from '@/lib/collection';
+import { removeByEventId, removeById, restoreAt, updateById } from '@/lib/collection';
 import { STORAGE_KEYS, STORE_VERSION } from '@/lib/constants';
 import { createId } from '@/lib/id';
 import { createMigrate, createSafeStorage } from '@/lib/storage';
@@ -14,7 +14,10 @@ interface GuestState {
 interface GuestActions {
   addGuest: (eventId: Id, input: GuestInput) => Guest;
   updateGuest: (id: Id, patch: Partial<GuestInput>) => void;
-  deleteGuest: (id: Id) => void;
+  /** Applies the same change to several guests in one update (bulk RSVP). */
+  updateGuests: (ids: ReadonlySet<Id>, patch: Partial<GuestInput>) => void;
+  /** Removes a guest and returns a function that restores them exactly (id, position). */
+  deleteGuest: (id: Id) => () => void;
   removeByEvent: (eventId: Id) => void;
   reset: () => void;
 }
@@ -28,7 +31,7 @@ function createInitialState(): GuestState {
 /** Guest lists across all events. */
 export const useGuestStore = create<GuestStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...createInitialState(),
 
       addGuest: (eventId, input) => {
@@ -41,8 +44,20 @@ export const useGuestStore = create<GuestStore>()(
         set((state) => ({ guests: updateById(state.guests, id, patch) }));
       },
 
+      updateGuests: (ids, patch) => {
+        set((state) => ({
+          guests: state.guests.map((guest) => (ids.has(guest.id) ? { ...guest, ...patch, id: guest.id } : guest)),
+        }));
+      },
+
       deleteGuest: (id) => {
+        const index = get().guests.findIndex((guest) => guest.id === id);
+        const removed = get().guests[index];
+        if (!removed) return () => undefined;
         set((state) => ({ guests: removeById(state.guests, id) }));
+        return () => {
+          set((state) => ({ guests: restoreAt(state.guests, index, removed) }));
+        };
       },
 
       removeByEvent: (eventId) => {

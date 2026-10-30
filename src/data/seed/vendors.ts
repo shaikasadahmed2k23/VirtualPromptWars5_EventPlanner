@@ -8,14 +8,34 @@ const CATEGORIES: readonly VendorCategory[] = ['venue', 'photographer', 'caterer
 const TIERS: readonly PriceTier[] = [1, 2, 3, 4];
 
 const NAMES = [
-  'Deccan Courtyard', 'Lakeview Celebrations', 'Marigold House', 'The Banyan Pavilion', 'Saffron Stories',
-  'Iris Lens Co.', 'Golden Hour Frames', 'Mango Tree Photography', 'Paper Boat Studio', 'Rasa Table',
-  'The Curry Leaf Kitchen', 'Pepper & Petal Catering', 'Namma Feast Co.', 'Gulmohar Decor', 'Mogra & Moss',
-  'Rangoli Rooms', 'Petal Theory', 'Kite & Kora Events', 'The Brass Band', 'Moonlight Music Co.',
-  'Dhol & Bloom', 'Rooftop Rhythm', 'Celebration Stage', 'Sitarra Entertainment',
+  'Deccan Courtyard',
+  'Lakeview Celebrations',
+  'Marigold House',
+  'The Banyan Pavilion',
+  'Saffron Stories',
+  'Iris Lens Co.',
+  'Golden Hour Frames',
+  'Mango Tree Photography',
+  'Paper Boat Studio',
+  'Rasa Table',
+  'The Curry Leaf Kitchen',
+  'Pepper & Petal Catering',
+  'Namma Feast Co.',
+  'Gulmohar Decor',
+  'Mogra & Moss',
+  'Rangoli Rooms',
+  'Petal Theory',
+  'Kite & Kora Events',
+  'The Brass Band',
+  'Moonlight Music Co.',
+  'Dhol & Bloom',
+  'Rooftop Rhythm',
+  'Celebration Stage',
+  'Sitarra Entertainment',
 ] as const;
 
-const PHOTOS_BY_CATEGORY: Record<VendorCategory, readonly PhotoKey[]> = {
+/** Curated imagery per vendor category; the first few double as a detail gallery. */
+export const VENDOR_CATEGORY_PHOTOS: Record<VendorCategory, readonly PhotoKey[]> = {
   venue: ['mandapHall', 'banquetHall', 'gardenGazebo', 'greenhouseCafe', 'marqueeDining'],
   photographer: ['vintageCamera', 'holdingHands', 'confettiKiss', 'forestPortrait', 'brideBouquet'],
   caterer: ['cateringBuffet', 'grazingPlatter', 'chefPrep', 'platedDinner', 'friendsDining'],
@@ -43,7 +63,7 @@ const SEEDS: readonly VendorSeed[] = NAMES.map((name, index) => {
   const category = CATEGORIES[index % CATEGORIES.length] ?? 'venue';
   const city = CITIES[index % CITIES.length] ?? 'Hyderabad';
   const priceTier = TIERS[index % TIERS.length] ?? 1;
-  const categoryPhotos = PHOTOS_BY_CATEGORY[category];
+  const categoryPhotos = VENDOR_CATEGORY_PHOTOS[category];
   return {
     name,
     category,
@@ -51,7 +71,7 @@ const SEEDS: readonly VendorSeed[] = NAMES.map((name, index) => {
     priceTier,
     rating: Number((4.2 + ((index * 7) % 8) / 10).toFixed(1)),
     reviewCount: 48 + index * 17,
-    startingPrice: (priceTier * 75_000) + (index % 3) * 25_000,
+    startingPrice: priceTier * 75_000 + (index % 3) * 25_000,
     currency: 'INR',
     description: DESCRIPTIONS[category],
     tags: [...TAGS[category]],
@@ -61,7 +81,7 @@ const SEEDS: readonly VendorSeed[] = NAMES.map((name, index) => {
   };
 });
 
-/** Curated sample directory vendors used by the demo directory. */
+/** Builds the sample vendor directory (demo data, never persisted). */
 export function createSeedVendors(): Vendor[] {
   return SEEDS.map((vendor, index) => ({
     ...vendor,
@@ -69,3 +89,9 @@ export function createSeedVendors(): Vendor[] {
     photoId: PHOTOS[vendor.photoId].id,
   }));
 }
+
+/** The static, read-only sample directory shown on the Vendors page. */
+export const VENDOR_DIRECTORY: readonly Vendor[] = createSeedVendors();
+
+/** Cities present in the directory, alphabetically, for the city filter. */
+export const VENDOR_CITIES: readonly string[] = [...new Set(VENDOR_DIRECTORY.map((vendor) => vendor.city))].sort();

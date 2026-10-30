@@ -1,5 +1,5 @@
 import { BUDGET_CATEGORIES } from '@shared/domain';
-import type { BudgetItem, BudgetSummary, CategoryTotal } from '@/types';
+import type { BudgetCategory, BudgetItem, BudgetSummary, CategoryTotal } from '@/types';
 
 const ratio = (part: number, whole: number): number => (whole > 0 ? part / whole : 0);
 
@@ -39,4 +39,11 @@ export function computeBudgetSummary(items: readonly BudgetItem[], totalBudget: 
     isOverBudget: committed > totalBudget,
     byCategory: [...byCategory.values()],
   };
+}
+
+/** Buckets budget lines by category (every category present, in display order). */
+export function groupItemsByCategory(items: readonly BudgetItem[]): Record<BudgetCategory, BudgetItem[]> {
+  const groups = Object.fromEntries(BUDGET_CATEGORIES.map((category) => [category, [] as BudgetItem[]]));
+  for (const item of items) groups[item.category]?.push(item);
+  return groups as Record<BudgetCategory, BudgetItem[]>;
 }

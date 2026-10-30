@@ -20,10 +20,14 @@ describe('BudgetPage', () => {
     await user.tab();
 
     await waitFor(() => {
-      expect(useBudgetStore.getState().items.find((item) => item.name.startsWith('Reception courtyard'))?.actual).toBe(500000);
+      expect(useBudgetStore.getState().items.find((item) => item.name.startsWith('Reception courtyard'))?.actual).toBe(
+        500000,
+      );
     });
     await user.click(screen.getAllByRole('button', { name: /view as table/i })[0]!);
-    expect(within(screen.getByRole('table', { name: /budget chart data/i })).getByText('₹5,00,000')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('table', { name: /budget chart data/i })).getByText('₹5,00,000'),
+    ).toBeInTheDocument();
   });
 
   it('adds and deletes a line with an undo toast', async () => {

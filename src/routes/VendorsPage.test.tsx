@@ -1,55 +1,82 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { resetDemoData } from '@/features/events/lib/eventLifecycle';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
 import { useVendorStore } from '@/features/vendors/store/useVendorStore';
-import { DEMO_EVENT_ID } from '@/lib/constants';
+import { DEMO_EVENT_ID, PAGE_SIZE } from '@/lib/constants';
 import { expectNoA11yViolations } from '@/test/a11y';
 import { renderRoute } from '@/test/renderRoute';
 
-beforeEach(() => resetDemoData());
+beforeEach(() => {
+  resetDemoData();
+});
+
+async function firstVendorCard() {
+  await screen.findByRole('heading', { level: 1, name: 'Vendors' });
+  const card = screen.getAllByRole('article')[0];
+  if (!card) throw new Error('Expected a vendor card');
+  const name = within(card).getByRole('heading', { level: 2 }).textContent ?? '';
+  return { card: within(card), name };
+}
 
 describe('VendorsPage', () => {
-  it('shortlists a vendor and adds it to the current budget', async () => {
+  it('shortlists a vendor and adds it to the current budget with Undo', async () => {
     const { user } = renderRoute('/vendors');
-    await screen.findByRole('heading', { level: 1, name: 'Vendors' });
-    const heading = screen.getAllByRole('heading', { level: 2 })[0];
-    const card = heading?.closest('[class*="rounded-2xl"]');
-    expect(card).not.toBeNull();
-    const scoped = within(card as HTMLElement);
-    await user.click(scoped.getByRole('button', { name: new RegExp(`add ${heading?.textContent ?? ''} to shortlist`, 'i') }));
-    const selectedVendor = useVendorStore.getState().shortlist[0];
-    expect(selectedVendor).toBeDefined();
-    await user.click(scoped.getByRole('button', { name: 'Add to budget' }));
-    await waitFor(() => expect(useBudgetStore.getState().items.some((item) => item.eventId === DEMO_EVENT_ID && item.vendorName === heading?.textContent)).toBe(true));
+    const { card, name } = await firstVendorCard();
+
+    await user.click(card.getByRole('button', { name: `Add ${name} to shortlist` }));
+    expect(useVendorStore.getState().shortlist).toHaveLength(1);
+    expect(card.getByRole('button', { name: `Remove ${name} from shortlist` })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('tab', { name: /shortlisted \(1\)/i })).toBeInTheDocument();
+
+    await user.click(card.getByRole('button', { name: 'Add to budget' }));
+    const added = () =>
+      useBudgetStore.getState().items.filter((item) => item.eventId === DEMO_EVENT_ID && item.vendorName === name);
+    expect(added()).toHaveLength(1);
+    await user.click(await screen.findByRole('button', { name: 'Undo' }));
+    expect(added()).toHaveLength(0);
   });
 
-  it('validates and saves a quote request locally', async () => {
+  it('validates and saves a quote request locally, pre-filled from the event', async () => {
     const { user } = renderRoute('/vendors');
-    await screen.findByRole('heading', { level: 1, name: 'Vendors' });
-    const heading = screen.getAllByRole('heading', { level: 2 })[0];
-    if (!heading) throw new Error('Expected a vendor heading');
-    const card = heading.closest('[class*="rounded-2xl"]');
-    if (!(card instanceof HTMLElement)) throw new Error('Expected a vendor card');
-    await user.click(within(card).getByRole('button', { name: 'Request quote' }));
-    const dialog = screen.getByRole('dialog');
-    await user.click(within(dialog).getByRole('button', { name: 'Save request' }));
-    expect(within(dialog).getByText('Name is required.')).toBeInTheDocument();
-    await user.type(within(dialog).getByRole('textbox', { name: 'Your name' }), 'Asha');
-    await user.type(within(dialog).getByRole('textbox', { name: 'Email' }), 'asha@example.com');
-    const dateInput = dialog.querySelector('input[type="date"]');
-    expect(dateInput).not.toBeNull();
-    fireEvent.change(dateInput!, { target: { value: '2030-01-01' } });
-    await user.type(within(dialog).getByRole('textbox', { name: 'Message' }), 'Please share a quote');
-    await user.click(within(dialog).getByRole('button', { name: 'Save request' }));
-    await waitFor(() => expect(useVendorStore.getState().quoteRequests).toHaveLength(1));
+    const { card } = await firstVendorCard();
+    await user.click(card.getByRole('button', { name: 'Request quote' }));
+    const dialog = within(screen.getByRole('dialog'));
+
+    expect(dialog.getByLabelText(/event date/i)).not.toHaveValue('');
+    await user.click(dialog.getByRole('button', { name: 'Save request' }));
+    expect(await dialog.findByText('Name is required.')).toBeInTheDocument();
+    expect(dialog.getByRole('textbox', { name: 'Your name' })).toHaveAccessibleDescription('Name is required.');
+
+    await user.type(dialog.getByRole('textbox', { name: 'Your name' }), 'Asha');
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'asha@example.com');
+    await user.type(dialog.getByRole('textbox', { name: 'Message' }), 'Please share a quote');
+    await user.click(dialog.getByRole('button', { name: 'Save request' }));
+    await waitFor(() => {
+      expect(useVendorStore.getState().quoteRequests).toHaveLength(1);
+    });
+    expect(useVendorStore.getState().quoteRequests[0]).toMatchObject({ eventId: DEMO_EVENT_ID, name: 'Asha' });
+  });
+
+  it('paginates the directory and filters by city', async () => {
+    const { user } = renderRoute('/vendors');
+    await firstVendorCard();
+    expect(screen.getAllByRole('article')).toHaveLength(PAGE_SIZE.vendors);
+    await user.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(screen.getByText(/page 2 of/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'City' }), 'Delhi');
+    await waitFor(() => {
+      expect(screen.getByRole('status')).not.toHaveTextContent('24 vendors found');
+    });
+    for (const card of screen.getAllByRole('article')) expect(card).toHaveTextContent('Delhi');
+    expect(screen.queryByText(/page 2 of/i)).not.toBeInTheDocument();
   });
 
   it('clears filters and has no accessibility violations', async () => {
     const { user, container } = renderRoute('/vendors');
     await screen.findByRole('heading', { level: 1, name: 'Vendors' });
     await user.selectOptions(screen.getByRole('combobox', { name: 'City' }), 'Delhi');
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument());
-    await user.click(screen.getByRole('button', { name: 'Clear filters' }));
+    await user.click(await screen.findByRole('button', { name: 'Clear filters' }));
     expect(screen.getByRole('status')).toHaveTextContent('24 vendors found');
     await expectNoA11yViolations(container);
   });

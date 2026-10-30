@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createSeedTasks } from '@/data/seed';
-import { removeByEventId, removeById, updateById } from '@/lib/collection';
+import { removeByEventId, removeById, restoreAt, updateById } from '@/lib/collection';
 import { STORAGE_KEYS, STORE_VERSION } from '@/lib/constants';
 import { nowISO } from '@/lib/dates';
 import { createId } from '@/lib/id';
@@ -18,7 +18,8 @@ interface TaskActions {
   addTasks: (eventId: Id, inputs: readonly TaskInput[], source?: TaskSource) => Task[];
   updateTask: (id: Id, patch: Partial<TaskInput>) => void;
   toggleTask: (id: Id) => void;
-  deleteTask: (id: Id) => void;
+  /** Removes a task and returns a function that restores it exactly (id, status, position). */
+  deleteTask: (id: Id) => () => void;
   removeByEvent: (eventId: Id) => void;
   reset: () => void;
 }
@@ -36,7 +37,7 @@ function createInitialState(): TaskState {
 /** Checklist tasks across all events. */
 export const useTaskStore = create<TaskStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...createInitialState(),
 
       addTask: (eventId, input, source = 'user') => {
@@ -62,7 +63,13 @@ export const useTaskStore = create<TaskStore>()(
       },
 
       deleteTask: (id) => {
+        const index = get().tasks.findIndex((task) => task.id === id);
+        const removed = get().tasks[index];
+        if (!removed) return () => undefined;
         set((state) => ({ tasks: removeById(state.tasks, id) }));
+        return () => {
+          set((state) => ({ tasks: restoreAt(state.tasks, index, removed) }));
+        };
       },
 
       removeByEvent: (eventId) => {

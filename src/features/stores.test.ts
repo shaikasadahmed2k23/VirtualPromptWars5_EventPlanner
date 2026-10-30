@@ -70,8 +70,21 @@ describe('task store', () => {
     const stored = useTaskStore.getState().tasks.find((t) => t.id === task.id);
     expect(stored).toMatchObject({ priority: 'high', done: true });
 
-    useTaskStore.getState().deleteTask(task.id);
+    const position = useTaskStore.getState().tasks.findIndex((t) => t.id === task.id);
+    const undo = useTaskStore.getState().deleteTask(task.id);
     expect(useTaskStore.getState().tasks.some((t) => t.id === task.id)).toBe(false);
+
+    undo();
+    // Undo restores the identical task (id, done state, position), not a copy.
+    expect(useTaskStore.getState().tasks[position]).toEqual(stored);
+    undo();
+    expect(useTaskStore.getState().tasks.filter((t) => t.id === task.id)).toHaveLength(1);
+  });
+
+  it('returns a no-op undo when deleting an unknown task', () => {
+    const before = useTaskStore.getState().tasks;
+    useTaskStore.getState().deleteTask('missing')();
+    expect(useTaskStore.getState().tasks).toEqual(before);
   });
 
   it('bulk-adds AI tasks with provenance', () => {
@@ -99,8 +112,10 @@ describe('budget store', () => {
     useBudgetStore.getState().updateItem(item.id, { actual: 9500, paid: true });
     expect(useBudgetStore.getState().items.find((i) => i.id === item.id)).toMatchObject({ actual: 9500, paid: true });
 
-    useBudgetStore.getState().deleteItem(item.id);
+    const undo = useBudgetStore.getState().deleteItem(item.id);
     expect(useBudgetStore.getState().items.some((i) => i.id === item.id)).toBe(false);
+    undo();
+    expect(useBudgetStore.getState().items.find((i) => i.id === item.id)).toMatchObject({ actual: 9500, paid: true });
   });
 });
 
@@ -118,8 +133,20 @@ describe('guest store', () => {
     useGuestStore.getState().updateGuest(guest.id, { rsvp: 'attending' });
     expect(useGuestStore.getState().guests.find((g) => g.id === guest.id)?.rsvp).toBe('attending');
 
-    useGuestStore.getState().deleteGuest(guest.id);
+    const undo = useGuestStore.getState().deleteGuest(guest.id);
     expect(useGuestStore.getState().guests.some((g) => g.id === guest.id)).toBe(false);
+    undo();
+    expect(useGuestStore.getState().guests.find((g) => g.id === guest.id)?.rsvp).toBe('attending');
+  });
+
+  it('bulk-updates only the selected guests', () => {
+    const [first, second, third] = useGuestStore.getState().guests;
+    if (!first || !second || !third) throw new Error('Expected seeded guests');
+    useGuestStore.getState().updateGuests(new Set([first.id, second.id]), { rsvp: 'declined' });
+    const byId = (id: string) => useGuestStore.getState().guests.find((g) => g.id === id);
+    expect(byId(first.id)?.rsvp).toBe('declined');
+    expect(byId(second.id)?.rsvp).toBe('declined');
+    expect(byId(third.id)?.rsvp).toBe(third.rsvp);
   });
 });
 

@@ -1,4 +1,4 @@
-import { filterByEventId, removeByEventId, removeById, updateById } from './collection';
+import { filterByEventId, removeByEventId, removeById, restoreAt, updateById } from './collection';
 
 const items = [
   { id: 'a', eventId: 'e1', name: 'Venue' },
@@ -20,6 +20,14 @@ describe('collection helpers', () => {
 
   it('removeById drops the matching item', () => {
     expect(removeById(items, 'a').map((item) => item.id)).toEqual(['b', 'c']);
+  });
+
+  it('restoreAt re-inserts a removed item at its original index, once', () => {
+    const removed = items[1]!;
+    const restored = restoreAt(removeById(items, 'b'), 1, removed);
+    expect(restored.map((item) => item.id)).toEqual(['a', 'b', 'c']);
+    expect(restoreAt(restored, 1, removed)).toHaveLength(3);
+    expect(restoreAt([], 5, removed).map((item) => item.id)).toEqual(['b']);
   });
 
   it('removeByEventId and filterByEventId partition by event', () => {

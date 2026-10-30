@@ -12,7 +12,9 @@ export function TaskProgress({ progress }: { progress: TaskProgress }) {
           <CheckCircle2 className="size-5 text-success" aria-hidden="true" />
           <h2 className="font-serif text-xl font-semibold">Checklist progress</h2>
         </div>
-        <span className="text-sm font-semibold">{progress.done} / {progress.total}</span>
+        <span className="text-sm font-semibold">
+          {progress.done} / {progress.total}
+        </span>
       </div>
       <div
         className="mt-4 h-3 overflow-hidden rounded-full bg-ivory-deep"
@@ -23,7 +25,10 @@ export function TaskProgress({ progress }: { progress: TaskProgress }) {
         aria-valuenow={percent}
         aria-valuetext={`${progress.done} of ${progress.total} tasks complete`}
       >
-        <div className="h-full rounded-full bg-success transition-[width] duration-300" style={{ width: `${percent}%` }} />
+        <div
+          className="h-full rounded-full bg-success transition-[width] duration-300"
+          style={{ width: `${percent}%` }}
+        />
       </div>
       <p className="mt-2 text-sm text-muted">{percent}% complete</p>
     </Card>

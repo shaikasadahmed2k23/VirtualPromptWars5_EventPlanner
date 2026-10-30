@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createSeedBudget } from '@/data/seed';
-import { removeByEventId, removeById, updateById } from '@/lib/collection';
+import { removeByEventId, removeById, restoreAt, updateById } from '@/lib/collection';
 import { STORAGE_KEYS, STORE_VERSION } from '@/lib/constants';
 import { createId } from '@/lib/id';
 import { createMigrate, createSafeStorage } from '@/lib/storage';
@@ -16,7 +16,8 @@ interface BudgetActions {
   /** Adds several lines at once (starter budget, AI allocations). */
   addItems: (eventId: Id, inputs: readonly BudgetItemInput[]) => BudgetItem[];
   updateItem: (id: Id, patch: Partial<BudgetItemInput>) => void;
-  deleteItem: (id: Id) => void;
+  /** Removes a line and returns a function that restores it exactly (id, position). */
+  deleteItem: (id: Id) => () => void;
   removeByEvent: (eventId: Id) => void;
   reset: () => void;
 }
@@ -30,7 +31,7 @@ function createInitialState(): BudgetState {
 /** Budget line items across all events. */
 export const useBudgetStore = create<BudgetStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...createInitialState(),
 
       addItem: (eventId, input) => {
@@ -50,7 +51,13 @@ export const useBudgetStore = create<BudgetStore>()(
       },
 
       deleteItem: (id) => {
+        const index = get().items.findIndex((item) => item.id === id);
+        const removed = get().items[index];
+        if (!removed) return () => undefined;
         set((state) => ({ items: removeById(state.items, id) }));
+        return () => {
+          set((state) => ({ items: restoreAt(state.items, index, removed) }));
+        };
       },
 
       removeByEvent: (eventId) => {
