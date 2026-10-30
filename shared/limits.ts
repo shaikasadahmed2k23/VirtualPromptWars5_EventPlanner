@@ -9,6 +9,7 @@ export const LIMITS = {
   venueMax: 100,
   requirementTextMax: 400,
   notesMax: 500,
+  phoneMax: 30,
   refinementMax: 300,
   guestCountMin: 1,
   guestCountMax: 5000,

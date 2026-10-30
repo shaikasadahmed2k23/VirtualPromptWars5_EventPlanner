@@ -49,5 +49,6 @@ export function createSeedGuests(): Guest[] {
     dietary,
     plusOnes,
     group,
+    notes: '',
   }));
 }

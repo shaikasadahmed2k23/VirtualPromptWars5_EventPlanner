@@ -24,6 +24,7 @@ export interface Guest {
   dietary: GuestDietary;
   plusOnes: number;
   group: GuestGroup;
+  notes?: string;
 }
 
 /** Editable guest fields. */
