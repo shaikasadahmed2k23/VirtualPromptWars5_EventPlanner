@@ -5,5 +5,5 @@ import { createAppRouter } from './router';
 /** Root component: owns the router instance. */
 export function App() {
   const [router] = useState(createAppRouter);
-  return <RouterProvider router={router} future={{ v7_startTransition: true }} />;
+  return <RouterProvider router={router} />;
 }

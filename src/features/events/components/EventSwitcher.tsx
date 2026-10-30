@@ -38,7 +38,7 @@ export function EventSwitcher({ current }: { current: CelebrationEvent }) {
               key={event.id}
               className={itemClass}
               onSelect={() => {
-                navigate(paths.event(event.id));
+                void navigate(paths.event(event.id));
               }}
             >
               <Check
@@ -55,7 +55,7 @@ export function EventSwitcher({ current }: { current: CelebrationEvent }) {
           <DropdownMenu.Item
             className={itemClass}
             onSelect={() => {
-              navigate(paths.newEvent());
+              void navigate(paths.newEvent());
             }}
           >
             <Plus className="size-4 text-rose-ink" aria-hidden="true" />

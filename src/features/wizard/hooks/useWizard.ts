@@ -55,7 +55,7 @@ export function useWizard() {
     toast.success(`${event.name} is ready`, {
       description: 'We’ve drafted a starter checklist and budget for you.',
     });
-    navigate(paths.event(event.id));
+    void navigate(paths.event(event.id));
   }, [draft, moveTo, clearDraft, navigate]);
 
   return { draft, stepIndex, focusHeading, completeStep, back, moveTo, submit };

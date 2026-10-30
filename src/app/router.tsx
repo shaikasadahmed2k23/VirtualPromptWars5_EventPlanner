@@ -48,14 +48,5 @@ export const routes: RouteObject[] = [
 
 /** Creates the browser router for the app. */
 export function createAppRouter() {
-  return createBrowserRouter(routes, { future: ROUTER_FUTURE_FLAGS });
+  return createBrowserRouter(routes);
 }
-
-/** Opt into React Router v7 behaviour now, so upgrading is a no-op. */
-export const ROUTER_FUTURE_FLAGS = {
-  v7_relativeSplatPath: true,
-  v7_fetcherPersist: true,
-  v7_normalizeFormMethod: true,
-  v7_partialHydration: true,
-  v7_skipActionErrorRevalidation: true,
-} as const;
