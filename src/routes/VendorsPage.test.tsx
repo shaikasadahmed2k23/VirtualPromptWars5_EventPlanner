@@ -29,7 +29,7 @@ describe('VendorsPage', () => {
     const heading = screen.getAllByRole('heading', { level: 2 })[0];
     if (!heading) throw new Error('Expected a vendor heading');
     const card = heading.closest('[class*="rounded-2xl"]');
-    if (!card) throw new Error('Expected a vendor card');
+    if (!(card instanceof HTMLElement)) throw new Error('Expected a vendor card');
     await user.click(within(card).getByRole('button', { name: 'Request quote' }));
     const dialog = screen.getByRole('dialog');
     await user.click(within(dialog).getByRole('button', { name: 'Save request' }));

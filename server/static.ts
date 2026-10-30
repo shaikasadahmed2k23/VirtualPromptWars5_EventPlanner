@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import compression from 'compression';
 import express, { type Express } from 'express';
 
 const ONE_YEAR_SECONDS = 31_536_000;
@@ -19,6 +20,7 @@ const SPA_ROUTE = /^(?!\/api(?:\/|$))(?!.*\/[^/]+\.[a-z0-9]+$).*/i;
 export function serveSpa(app: Express, staticDir: string): boolean {
   if (!existsSync(path.join(staticDir, INDEX_FILE))) return false;
 
+  app.use(compression());
   app.use(
     express.static(staticDir, {
       index: false,

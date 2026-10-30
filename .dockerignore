@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-server
+.env*
+.git
+.gitignore
+coverage
+**/*.test.*
+**/tests
+**/__tests__
+**/screenshots
+screenshots
+*.snap
+*.log
+*.tsbuildinfo
+README*
+DEPLOY.md
