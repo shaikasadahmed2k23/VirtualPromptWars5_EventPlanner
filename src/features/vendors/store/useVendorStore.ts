@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { createSeedVendors } from '@/data/seed';
 import { STORAGE_KEYS, STORE_VERSION } from '@/lib/constants';
 import { nowISO } from '@/lib/dates';
 import { createId } from '@/lib/id';
@@ -7,6 +8,7 @@ import { createMigrate, createSafeStorage } from '@/lib/storage';
 import type { Id, QuoteRequest } from '@/types';
 
 interface VendorState {
+  vendors: ReturnType<typeof createSeedVendors>;
   /** Ids of shortlisted vendors. */
   shortlist: Id[];
   quoteRequests: QuoteRequest[];
@@ -21,7 +23,7 @@ interface VendorActions {
 export type VendorStore = VendorState & VendorActions;
 
 function createInitialState(): VendorState {
-  return { shortlist: [], quoteRequests: [] };
+  return { vendors: createSeedVendors(), shortlist: [], quoteRequests: [] };
 }
 
 /** Vendor shortlist and quote requests (the directory itself is static demo data). */
@@ -52,7 +54,7 @@ export const useVendorStore = create<VendorStore>()(
       name: STORAGE_KEYS.vendors,
       version: STORE_VERSION,
       storage: createSafeStorage<VendorState>(),
-      partialize: ({ shortlist, quoteRequests }) => ({ shortlist, quoteRequests }),
+      partialize: ({ vendors, shortlist, quoteRequests }) => ({ vendors, shortlist, quoteRequests }),
       migrate: createMigrate<VendorState>(createInitialState),
     },
   ),
