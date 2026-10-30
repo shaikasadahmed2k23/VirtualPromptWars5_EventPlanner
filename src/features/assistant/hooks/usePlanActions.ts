@@ -29,7 +29,7 @@ export function usePlanActions(event: CelebrationEvent) {
 
   const addToBudget = useCallback(
     (input: BudgetItemInput) => {
-      const item = addItem(event.id, input);
+      const item = addItem(event.id, { ...input, source: 'ai' });
       toast.success(`Added “${input.name}” to your budget`, {
         action: { label: 'Undo', onClick: () => deleteItem(item.id) },
       });

@@ -14,6 +14,8 @@ export interface BudgetItem {
   actual: number;
   paid: boolean;
   vendorName: string;
+  notes?: string;
+  source?: 'ai' | 'manual';
 }
 
 /** Editable budget item fields. */
