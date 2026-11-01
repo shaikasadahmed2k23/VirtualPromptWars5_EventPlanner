@@ -9,6 +9,7 @@ import { createLogger } from '../lib/logger.js';
 import { createAIService } from '../services/aiService.js';
 import type { ModelClient, ModelRequest } from '../services/gemini.js';
 
+/** A complete, valid event brief shared by the server tests. */
 export const BRIEF: EventBrief = {
   type: 'wedding',
   name: 'Meera & Arjun',
@@ -31,6 +32,7 @@ export const MODEL_PLAN = {
   ...generateDemoPlan(BRIEF),
   concept: { ...generateDemoPlan(BRIEF).concept, title: 'Live Gemini Plan' },
 };
+/** Valid themes, as a well-behaved model would return them. */
 export const MODEL_THEMES = generateDemoThemes(BRIEF);
 
 /** A fake model client whose responses are scripted per test. */
@@ -38,6 +40,7 @@ export interface FakeModel extends ModelClient {
   generateJson: ReturnType<typeof vi.fn<(request: ModelRequest) => Promise<string>>>;
 }
 
+/** Model client that answers with `responses` in order (repeating the last); an `Error` entry makes that call reject. */
 export function fakeModel(...responses: (string | Error)[]): FakeModel {
   const queue = [...responses];
   return {

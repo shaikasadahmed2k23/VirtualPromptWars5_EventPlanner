@@ -1,4 +1,5 @@
 import { History, RotateCcw } from 'lucide-react';
+import { useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { dateOfTimestamp, formatDisplayDate } from '@/lib/dates';
@@ -6,7 +7,7 @@ import type { StoredPlan } from '@/types';
 import { AIModeBadge } from './AIModeBadge';
 
 interface PlanHistoryProps {
-  history: StoredPlan[];
+  history: readonly StoredPlan[];
   onRestore: (planId: string) => void;
   disabled: boolean;
 }
@@ -15,10 +16,11 @@ const describe = (version: StoredPlan) => version.refinements.at(-1) ?? 'Origina
 
 /** Earlier plan versions (most recent first) with one-click restore. */
 export function PlanHistory({ history, onRestore, disabled }: PlanHistoryProps) {
+  const titleId = useId();
   return (
     <Card className="p-5 sm:p-6">
-      <section aria-labelledby="history-title">
-        <h2 id="history-title" className="flex items-center gap-2 text-2xl">
+      <section aria-labelledby={titleId}>
+        <h2 id={titleId} className="flex items-center gap-2 text-2xl">
           <History className="size-5 text-rose-ink" aria-hidden="true" />
           Earlier versions
         </h2>

@@ -37,10 +37,10 @@ function sanitise(node: unknown): unknown {
 }
 
 /** Converts a shared Zod schema into the JSON Schema sent to Gemini. */
-export function toModelSchema(schema: ZodType<unknown>): object {
+function toModelSchema(schema: ZodType<unknown>): object {
   return sanitise(zodToJsonSchema(schema, { $refStrategy: 'none', target: 'jsonSchema7' })) as object;
 }
 
-/** Derived once at startup from the same schemas used for validation. */
+/** Structured-output schemas, derived once at startup from the same Zod schemas used for validation. */
 export const PLAN_MODEL_SCHEMA = toModelSchema(aiPlanSchema);
 export const THEMES_MODEL_SCHEMA = toModelSchema(themesResponseSchema);

@@ -1,7 +1,8 @@
 import { daysBetween, formatDisplayDate } from '@/lib/dates';
 import type { ISODate, Task } from '@/types';
 
-export const TIMELINE_GROUPS = [
+/** Timeline buckets, ordered from furthest out to after the event. */
+const TIMELINE_GROUPS = [
   '12+ months before',
   '6–12 months',
   '3–6 months',
@@ -12,7 +13,8 @@ export const TIMELINE_GROUPS = [
 ] as const;
 
 export type TimelineGroup = (typeof TIMELINE_GROUPS)[number];
-export const TIMELINE_BOUNDARIES = {
+/** Upper bound, in days before the event, of each bucket (the "12+ months" bucket is open-ended). */
+const TIMELINE_BOUNDARIES = {
   eventWeekDays: 7,
   finalMonthDays: 30,
   oneToThreeMonthsDays: 90,

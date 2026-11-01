@@ -1,5 +1,5 @@
+import { Cake, Gem, HeartHandshake, type LucideIcon, Users } from 'lucide-react';
 import type { EventStyle, EventType } from '@shared/domain';
-import { Cake, Gem, HeartHandshake, Users, type LucideIcon } from 'lucide-react';
 import type { PhotoKey } from '@/data/photos';
 
 /** Presentation metadata for an event type. */
@@ -10,6 +10,7 @@ export interface EventTypeMeta {
   photo: PhotoKey;
 }
 
+/** Icon, pitch and cover photo per event type, shared by the landing page and the wizard. */
 export const EVENT_TYPE_META: Record<EventType, EventTypeMeta> = {
   wedding: {
     icon: HeartHandshake,

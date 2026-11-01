@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
+/** How often the progress message rotates; slow enough for screen readers to finish each one. */
 export const LOADING_MESSAGE_INTERVAL_MS = 3_000;
+/** After this long, stop rotating and reassure the user instead. */
 export const LOADING_MESSAGE_SLOW_THRESHOLD_MS = 10_000;
 
 const LOADING_MESSAGES = ['Designing your décor…', 'Curating the menu…', 'Building your schedule…'] as const;
