@@ -26,5 +26,8 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm test
+      - run: npm run test:coverage
       - run: npm run build
+      # Last, so a dependency advisory never hides the result of the checks above.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
