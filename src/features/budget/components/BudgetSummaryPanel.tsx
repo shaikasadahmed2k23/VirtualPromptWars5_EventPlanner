@@ -6,8 +6,8 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { StatCard } from '@/components/ui/stat-card';
-import { formatCurrency, formatPercent } from '@/lib/format';
 import { useEventStore } from '@/features/events/store/useEventStore';
+import { formatCurrency, formatPercent } from '@/lib/format';
 import type { BudgetSummary, CelebrationEvent } from '@/types';
 import { totalBudgetSchema } from '../lib/budgetValidation';
 

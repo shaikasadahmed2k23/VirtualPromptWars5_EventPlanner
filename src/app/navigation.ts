@@ -3,6 +3,7 @@ import {
   CheckSquare,
   Home,
   LayoutDashboard,
+  type LucideIcon,
   Palette,
   PlusCircle,
   Settings,
@@ -10,7 +11,6 @@ import {
   Store,
   Users,
   Wallet,
-  type LucideIcon,
 } from 'lucide-react';
 import type { Id } from '@/types';
 

@@ -1,6 +1,6 @@
-import { LIMITS } from '@shared/limits';
 import { Wand2 } from 'lucide-react';
-import { useId, useState, type FormEvent } from 'react';
+import { type FormEvent, useId, useState } from 'react';
+import { LIMITS } from '@shared/limits';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';

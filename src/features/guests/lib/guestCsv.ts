@@ -1,5 +1,5 @@
-import type { Guest } from '@/types';
 import { GUEST_DIETARY_LABELS, GUEST_GROUP_LABELS, RSVP_LABELS } from '@/lib/labels';
+import type { Guest } from '@/types';
 
 /** Leading characters that make spreadsheet apps evaluate a cell as a formula. */
 const FORMULA_PREFIX = /^[=+\-@\t\r]/;

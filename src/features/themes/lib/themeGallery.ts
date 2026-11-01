@@ -1,5 +1,5 @@
+import { MOOD_PHOTOS, type Photo, type PhotoKey, PHOTOS } from '@/data/photos';
 import { PHOTO_TAGS } from '@/data/photoTags';
-import { MOOD_PHOTOS, PHOTOS, type Photo, type PhotoKey } from '@/data/photos';
 import type { ThemeSuggestion } from '@/types';
 
 /** Number of photos in each theme's mood-board gallery. */

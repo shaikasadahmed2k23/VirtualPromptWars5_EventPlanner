@@ -1,20 +1,36 @@
-import type { AIPlan } from '@shared/ai';
 import { useCallback, useMemo, useRef } from 'react';
+import type { AIPlan } from '@shared/ai';
 import { nowISO } from '@/lib/dates';
 import { useAbortableRequest } from '@/lib/hooks/useAbortableRequest';
 import { createId } from '@/lib/id';
-import type { CelebrationEvent, StoredPlan } from '@/types';
-import { requestPlan, requestRefinedPlan, type AIOutcome } from '../lib/aiRequests';
+import type { AsyncStatus, CelebrationEvent, StoredPlan } from '@/types';
+import { type AIOutcome, requestPlan, requestRefinedPlan } from '../lib/aiRequests';
 import { toEventBrief } from '../lib/toEventBrief';
 import { useAssistantStore } from '../store/useAssistantStore';
 
 const NO_HISTORY: StoredPlan[] = [];
 
+/** The event's current plan, earlier versions and request state, with the actions that change them. */
+export interface AIPlanState {
+  current: StoredPlan | undefined;
+  /** Earlier versions, newest first. */
+  history: readonly StoredPlan[];
+  status: AsyncStatus;
+  error: string | null;
+  isWorking: boolean;
+  /** Generates a plan; `force` skips the client cache ("Regenerate"). */
+  generate: (options?: { force?: boolean }) => Promise<void>;
+  refine: (instruction: string) => Promise<void>;
+  /** Repeats the last generate or refine. */
+  retry: () => Promise<void>;
+  restore: (planId: string) => void;
+}
+
 /**
  * The event's AI plan plus actions to generate, refine, retry and restore it.
  * Requests are cancelled automatically when the page unmounts.
  */
-export function useAIPlan(event: CelebrationEvent) {
+export function useAIPlan(event: CelebrationEvent): AIPlanState {
   const current = useAssistantStore((state) => state.plans[event.id]);
   const history = useAssistantStore((state) => state.history[event.id] ?? NO_HISTORY);
   const setPlan = useAssistantStore((state) => state.setPlan);

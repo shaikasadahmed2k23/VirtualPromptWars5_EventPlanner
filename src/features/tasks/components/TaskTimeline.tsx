@@ -2,9 +2,9 @@ import { CalendarDays, CheckCircle2 } from 'lucide-react';
 import { useId, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { formatTaskDeadline, groupTasksByTimeline } from '../lib/taskTimeline';
 import { TASK_CATEGORY_LABELS } from '@/lib/labels';
 import type { ISODate, Task } from '@/types';
+import { formatTaskDeadline, groupTasksByTimeline } from '../lib/taskTimeline';
 import { PriorityBadge } from './TaskBadges';
 
 interface TaskTimelineProps {

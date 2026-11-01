@@ -1,6 +1,6 @@
 import { Photo } from '@/components/ui/photo';
-import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
+import { ASPECT } from '@/lib/constants';
 import { FEATURES } from '../content';
 import { EditorialHeading } from './EditorialHeading';
 

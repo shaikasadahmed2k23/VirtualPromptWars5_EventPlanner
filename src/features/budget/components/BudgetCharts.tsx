@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -11,10 +11,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import type { CurrencyCode } from '@shared/domain';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/format';
-import type { CurrencyCode } from '@shared/domain';
 import type { BudgetChartRow } from '../lib/budgetChartData';
 
 /** Category colours, all theme tokens so charts follow the design system. */

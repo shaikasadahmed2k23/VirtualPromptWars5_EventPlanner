@@ -1,5 +1,5 @@
-import { generateDemoThemes } from '@shared/demo/themes';
 import { screen, within } from '@testing-library/react';
+import { generateDemoThemes } from '@shared/demo/themes';
 import { toEventBrief } from '@/features/assistant/lib/toEventBrief';
 import { resetDemoData } from '@/features/events/lib/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';

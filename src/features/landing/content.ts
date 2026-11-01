@@ -1,4 +1,4 @@
-import { CalendarCheck2, Images, ListChecks, Sparkles, Store, UsersRound, Wallet, type LucideIcon } from 'lucide-react';
+import { CalendarCheck2, Images, ListChecks, type LucideIcon, Sparkles, Store, UsersRound, Wallet } from 'lucide-react';
 
 /** Copy for the landing page, kept apart from layout. */
 

@@ -1,8 +1,8 @@
 import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
+import type { FilterOption } from '@/lib/filterOptions';
 import { cn } from '@/lib/utils';
 import { Field } from './field';
-import type { FilterOption } from '@/lib/filterOptions';
 import { Input, Select } from './input';
 
 interface FilterSelectProps<T extends string | number> {

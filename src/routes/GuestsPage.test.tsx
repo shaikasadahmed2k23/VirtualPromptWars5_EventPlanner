@@ -1,8 +1,8 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { toast } from 'sonner';
 import { resetDemoData } from '@/features/events/lib/eventLifecycle';
-import { useGuestStore } from '@/features/guests/store/useGuestStore';
 import { useEventStore } from '@/features/events/store/useEventStore';
+import { useGuestStore } from '@/features/guests/store/useGuestStore';
 import { DEMO_EVENT_ID } from '@/lib/constants';
 import { expectNoA11yViolations } from '@/test/a11y';
 import { renderRoute } from '@/test/renderRoute';

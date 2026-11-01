@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { LIMITS } from '@shared/limits';
 import { BUDGET_CATEGORIES } from '@shared/domain';
-import type { BudgetItemInput } from '@/types';
+import { LIMITS } from '@shared/limits';
 import { formatCurrency } from '@/lib/format';
+import type { BudgetItemInput } from '@/types';
 
 const amount = z
   .number({ invalid_type_error: 'Enter an amount.' })

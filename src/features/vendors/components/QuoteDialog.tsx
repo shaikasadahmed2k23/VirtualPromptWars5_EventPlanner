@@ -5,7 +5,7 @@ import { FormDialog } from '@/components/ui/form-dialog';
 import { Input, Textarea } from '@/components/ui/input';
 import { useDialogForm } from '@/lib/hooks/useDialogForm';
 import type { CelebrationEvent, Vendor } from '@/types';
-import { quoteRequestSchema, type QuoteRequestInput } from '../lib/vendorValidation';
+import { type QuoteRequestInput, quoteRequestSchema } from '../lib/vendorValidation';
 import { useVendorStore } from '../store/useVendorStore';
 
 interface QuoteDialogProps {

@@ -1,4 +1,4 @@
-import { GUEST_DIETARY, type Guest, type GuestDietary, type GuestStats } from '@/types';
+import { type Guest, GUEST_DIETARY, type GuestDietary, type GuestStats } from '@/types';
 
 /** Computes RSVP counts, headcount (with plus-ones) and dietary needs of attending guests. */
 export function computeGuestStats(guests: readonly Guest[]): GuestStats {

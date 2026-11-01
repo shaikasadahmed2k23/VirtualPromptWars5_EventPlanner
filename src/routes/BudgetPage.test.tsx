@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { resetDemoData } from '@/features/events/lib/eventLifecycle';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
+import { resetDemoData } from '@/features/events/lib/eventLifecycle';
 import { DEMO_EVENT_ID } from '@/lib/constants';
 import { expectNoA11yViolations } from '@/test/a11y';
 import { renderRoute } from '@/test/renderRoute';

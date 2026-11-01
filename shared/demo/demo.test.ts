@@ -1,4 +1,4 @@
-import { aiPlanSchema, themesResponseSchema, type EventBrief } from '../ai.js';
+import { aiPlanSchema, type EventBrief, themesResponseSchema } from '../ai.js';
 import { EVENT_STYLES, EVENT_TYPES } from '../domain.js';
 import { deriveDemoContext, spendTier } from './context.js';
 import { generateDemoPlan, shiftTime } from './plan.js';

@@ -7,14 +7,14 @@ import { AIModeBadge } from '@/features/assistant/components/AIModeBadge';
 import { AIStatus } from '@/features/assistant/components/AIStatus';
 import { useCurrentEvent } from '@/features/events/hooks/useCurrentEvent';
 import { ThemeCard } from '@/features/themes/components/ThemeCard';
-import { useAIThemes } from '@/features/themes/hooks/useAIThemes';
+import { type AIThemesState, useAIThemes } from '@/features/themes/hooks/useAIThemes';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import type { CelebrationEvent } from '@/types';
 
 const SKELETON_CARDS = 3;
 
 interface ThemesSectionProps {
-  themes: ReturnType<typeof useAIThemes>;
+  themes: AIThemesState;
   event: CelebrationEvent;
 }
 

@@ -1,6 +1,5 @@
 import { ListChecks, PartyPopper } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { notifyWithUndo } from '@/lib/undoToast';
 import { paths } from '@/app/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -12,6 +11,7 @@ import { isTaskOverdue, selectUpcomingTasks } from '@/features/tasks/lib/taskSta
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';
 import { UPCOMING_TASKS_LIMIT } from '@/lib/constants';
 import { formatDisplayDate, todayISO } from '@/lib/dates';
+import { notifyWithUndo } from '@/lib/undoToast';
 import { cn } from '@/lib/utils';
 import type { CelebrationEvent, Task } from '@/types';
 

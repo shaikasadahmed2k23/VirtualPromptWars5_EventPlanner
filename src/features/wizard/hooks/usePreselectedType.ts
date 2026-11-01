@@ -1,6 +1,6 @@
-import { EVENT_TYPES, type EventType } from '@shared/domain';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { EVENT_TYPES, type EventType } from '@shared/domain';
 import { useWizardDraftStore } from '../store/useWizardDraftStore';
 
 const isEventType = (value: string | null): value is EventType =>

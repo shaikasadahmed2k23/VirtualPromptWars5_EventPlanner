@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react';
-import { useState, type ReactElement } from 'react';
+import { type ReactElement, useState } from 'react';
 import { Button } from './button';
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from './dialog';
 

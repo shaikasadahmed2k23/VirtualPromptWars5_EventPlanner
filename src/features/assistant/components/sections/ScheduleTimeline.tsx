@@ -1,5 +1,5 @@
-import type { AIPlan } from '@shared/ai';
 import { Clock3 } from 'lucide-react';
+import type { AIPlan } from '@shared/ai';
 import { Card } from '@/components/ui/card';
 import { PlanSection } from '../PlanSection';
 

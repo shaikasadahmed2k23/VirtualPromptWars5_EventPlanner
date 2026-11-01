@@ -1,5 +1,5 @@
-import { API_ERROR_CODES, type AIResponseMeta, type ApiErrorCode } from '@shared/api';
 import { z, type ZodType } from 'zod';
+import { type AIResponseMeta, API_ERROR_CODES, type ApiErrorCode } from '@shared/api';
 import { AI_REQUEST_TIMEOUT_MS } from './constants';
 
 /** Error codes the client can raise: the server's plus transport-level failures. */

@@ -5,7 +5,7 @@ import { FormDialog } from '@/components/ui/form-dialog';
 import { Input, LabelledOptions, Select, Textarea } from '@/components/ui/input';
 import { useDialogForm } from '@/lib/hooks/useDialogForm';
 import { GUEST_DIETARY_LABELS, GUEST_GROUP_LABELS, RSVP_LABELS } from '@/lib/labels';
-import { GUEST_DIETARY, GUEST_GROUPS, RSVP_STATUSES, type Guest, type GuestInput, type Id } from '@/types';
+import { type Guest, GUEST_DIETARY, GUEST_GROUPS, type GuestInput, type Id, RSVP_STATUSES } from '@/types';
 import { guestInputSchema } from '../lib/guestValidation';
 import { useGuestStore } from '../store/useGuestStore';
 

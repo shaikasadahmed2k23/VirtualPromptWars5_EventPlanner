@@ -6,11 +6,19 @@ import { notifyWithUndo } from '@/lib/undoToast';
 import type { BudgetItemInput, CelebrationEvent, TaskInput } from '@/types';
 import { useAssistantStore } from '../store/useAssistantStore';
 
+/** Ways to keep parts of an AI plan; each confirms with an undo toast. */
+export interface PlanActions {
+  addToChecklist: (input: TaskInput) => void;
+  addToBudget: (input: BudgetItemInput) => void;
+  /** Marks the current plan as saved to the event. */
+  savePlan: () => void;
+}
+
 /**
  * One-click actions from the AI plan: add to checklist, add to budget and
  * save the plan. Every action confirms with a toast that offers Undo.
  */
-export function usePlanActions(event: CelebrationEvent) {
+export function usePlanActions(event: CelebrationEvent): PlanActions {
   const addTask = useTaskStore((state) => state.addTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
   const addItem = useBudgetStore((state) => state.addItem);

@@ -3,15 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { paths } from '@/app/navigation';
 import { createEventWithStarterPlan } from '@/features/events/lib/eventLifecycle';
-import { firstInvalidStep, toNewEventInput, wizardSchema, type WizardDraft } from '../lib/wizardSchema';
+import { firstInvalidStep, toNewEventInput, type WizardDraft, wizardSchema } from '../lib/wizardSchema';
 import { WIZARD_STEPS } from '../lib/wizardSteps';
 import { useWizardDraftStore } from '../store/useWizardDraftStore';
+
+/** Wizard position and draft, with step navigation and the final submit. */
+export interface WizardState {
+  draft: WizardDraft;
+  stepIndex: number;
+  /** True after a step change, so the new step moves focus to its heading. */
+  focusHeading: boolean;
+  completeStep: (values: WizardDraft) => void;
+  back: () => void;
+  moveTo: (index: number) => void;
+  submit: () => void;
+}
 
 /**
  * Wizard orchestration: step navigation over the persisted draft, heading
  * focus management, and final submission (event + starter plan + redirect).
  */
-export function useWizard() {
+export function useWizard(): WizardState {
   const draft = useWizardDraftStore((state) => state.draft);
   const stepIndex = useWizardDraftStore((state) => state.stepIndex);
   const saveStep = useWizardDraftStore((state) => state.saveStep);

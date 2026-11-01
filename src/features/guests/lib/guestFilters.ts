@@ -1,12 +1,12 @@
-import { ALL, toFilterOptions, type All, type FilterOption } from '@/lib/filterOptions';
+import { ALL, type All, type FilterOption, toFilterOptions } from '@/lib/filterOptions';
 import { GUEST_DIETARY_LABELS, GUEST_GROUP_LABELS, RSVP_LABELS } from '@/lib/labels';
 import {
+  type Guest,
   GUEST_DIETARY,
   GUEST_GROUPS,
-  RSVP_STATUSES,
-  type Guest,
   type GuestDietary,
   type GuestGroup,
+  RSVP_STATUSES,
   type RsvpStatus,
 } from '@/types';
 

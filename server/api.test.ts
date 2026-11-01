@@ -1,6 +1,6 @@
 // @vitest-environment node
 import request from 'supertest';
-import { aiPlanSchema, themesResponseSchema, type AIPlan } from '../shared/ai.js';
+import { type AIPlan, aiPlanSchema, themesResponseSchema } from '../shared/ai.js';
 import { LIMITS } from '../shared/limits.js';
 import { aiBody, BRIEF, buildTestApp, errorBody, fakeModel, MODEL_PLAN, MODEL_THEMES } from './test/helpers.js';
 

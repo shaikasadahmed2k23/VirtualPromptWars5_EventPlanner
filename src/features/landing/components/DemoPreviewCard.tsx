@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { paths } from '@/app/navigation';
 import { Photo } from '@/components/ui/photo';
-import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { createSeedEvent } from '@/data/seed';
+import { ASPECT } from '@/lib/constants';
 import { daysBetween, formatDisplayDate, todayISO } from '@/lib/dates';
 import { pluralize } from '@/lib/format';
 import { cn } from '@/lib/utils';

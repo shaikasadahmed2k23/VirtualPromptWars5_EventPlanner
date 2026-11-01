@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
 /**
  * Returns a ref whose element receives focus on mount when `enabled` is true.

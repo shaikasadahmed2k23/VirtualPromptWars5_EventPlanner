@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { escapeCsvCell, guestsToCsv } from './guestCsv';
 import type { Guest } from '@/types';
+import { escapeCsvCell, guestsToCsv } from './guestCsv';
 
 const guest: Guest = {
   id: 'guest',

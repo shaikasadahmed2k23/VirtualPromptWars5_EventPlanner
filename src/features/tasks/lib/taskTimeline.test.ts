@@ -1,5 +1,5 @@
-import { groupTasksByTimeline, timelineGroupForDate } from './taskTimeline';
 import type { Task } from '@/types';
+import { groupTasksByTimeline, timelineGroupForDate } from './taskTimeline';
 
 const EVENT_DATE = '2030-01-01';
 

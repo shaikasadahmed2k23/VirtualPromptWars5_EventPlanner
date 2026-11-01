@@ -1,9 +1,9 @@
-import { aiPlanSchema, themesResponseSchema, type AIPlan, type EventBrief, type ThemesResponse } from '@shared/ai';
-import { API_ROUTES, type AIMode } from '@shared/api';
+import type { ZodType } from 'zod';
+import { type AIPlan, aiPlanSchema, type EventBrief, type ThemesResponse, themesResponseSchema } from '@shared/ai';
+import { type AIMode, API_ROUTES } from '@shared/api';
 import { generateDemoPlan } from '@shared/demo/plan';
 import { generateDemoThemes } from '@shared/demo/themes';
-import type { ZodType } from 'zod';
-import { ApiClientError, postAI, type ClientErrorCode } from '@/lib/apiClient';
+import { ApiClientError, type ClientErrorCode, postAI } from '@/lib/apiClient';
 import { aiCacheKey, readCachedResponse, writeCachedResponse } from './responseCache';
 
 /** An AI result and where it came from. */

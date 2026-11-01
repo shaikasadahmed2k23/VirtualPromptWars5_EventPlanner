@@ -1,5 +1,5 @@
-import type { BudgetCategory, BudgetSummary } from '@/types';
 import { BUDGET_CATEGORY_LABELS } from '@/lib/labels';
+import type { BudgetCategory, BudgetSummary } from '@/types';
 
 /** One category's figures, shaped for the charts and their table alternative. */
 export interface BudgetChartRow {

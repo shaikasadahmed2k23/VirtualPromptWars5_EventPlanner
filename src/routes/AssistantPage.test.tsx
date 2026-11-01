@@ -1,15 +1,15 @@
-import { generateDemoPlan } from '@shared/demo/plan';
 import { screen, waitFor, within } from '@testing-library/react';
+import { generateDemoPlan } from '@shared/demo/plan';
 import { toEventBrief } from '@/features/assistant/lib/toEventBrief';
 import { useAssistantStore } from '@/features/assistant/store/useAssistantStore';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
 import { resetDemoData } from '@/features/events/lib/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';
-import type { CelebrationEvent } from '@/types';
 import { expectNoA11yViolations } from '@/test/a11y';
 import { aiResponse, jsonResponse, mockFetch, requestBody } from '@/test/mockFetch';
 import { renderRoute } from '@/test/renderRoute';
+import type { CelebrationEvent } from '@/types';
 
 function createBirthday(): CelebrationEvent {
   return useEventStore.getState().createEvent({

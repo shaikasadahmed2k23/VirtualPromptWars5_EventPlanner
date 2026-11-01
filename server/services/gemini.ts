@@ -1,4 +1,4 @@
-import { GoogleGenAI, ThinkingLevel, type ThinkingConfig } from '@google/genai';
+import { GoogleGenAI, type ThinkingConfig, ThinkingLevel } from '@google/genai';
 
 /** One structured-output request to a language model. */
 export interface ModelRequest {

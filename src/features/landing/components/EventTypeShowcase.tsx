@@ -1,11 +1,11 @@
-import { EVENT_TYPES } from '@shared/domain';
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { EVENT_TYPES } from '@shared/domain';
 import { paths } from '@/app/navigation';
 import { Photo } from '@/components/ui/photo';
-import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
+import { ASPECT } from '@/lib/constants';
 import { EVENT_TYPE_LABELS } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import { EditorialHeading } from './EditorialHeading';

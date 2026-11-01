@@ -1,15 +1,27 @@
 import { useCallback, useMemo } from 'react';
-import { notifyWithUndo } from '@/lib/undoToast';
 import { requestThemes } from '@/features/assistant/lib/aiRequests';
 import { toEventBrief } from '@/features/assistant/lib/toEventBrief';
 import { useAssistantStore } from '@/features/assistant/store/useAssistantStore';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { nowISO } from '@/lib/dates';
 import { useAbortableRequest } from '@/lib/hooks/useAbortableRequest';
-import type { CelebrationEvent, ThemeSuggestion } from '@/types';
+import { notifyWithUndo } from '@/lib/undoToast';
+import type { AsyncStatus, CelebrationEvent, StoredThemes, ThemeSuggestion } from '@/types';
+
+/** Stored theme suggestions and request state, with generate and "use this theme" actions. */
+export interface AIThemesState {
+  stored: StoredThemes | undefined;
+  status: AsyncStatus;
+  error: string | null;
+  isWorking: boolean;
+  /** Generates three themes; `force` skips the client cache ("New ideas"). */
+  generate: (options?: { force?: boolean }) => Promise<void>;
+  /** Applies a theme to the event, with undo back to the previous one. */
+  applyTheme: (theme: ThemeSuggestion) => void;
+}
 
 /** AI theme suggestions for an event, plus generate and "use this theme" actions. */
-export function useAIThemes(event: CelebrationEvent) {
+export function useAIThemes(event: CelebrationEvent): AIThemesState {
   const stored = useAssistantStore((state) => state.themes[event.id]);
   const setThemes = useAssistantStore((state) => state.setThemes);
   const saveTheme = useEventStore((state) => state.saveTheme);

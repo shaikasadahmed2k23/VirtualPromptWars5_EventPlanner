@@ -9,14 +9,12 @@ import { PlanHistory } from '@/features/assistant/components/PlanHistory';
 import { PlanSkeleton } from '@/features/assistant/components/PlanSkeleton';
 import { PlanView } from '@/features/assistant/components/PlanView';
 import { RefinePanel } from '@/features/assistant/components/RefinePanel';
-import { useAIPlan } from '@/features/assistant/hooks/useAIPlan';
+import { type AIPlanState, useAIPlan } from '@/features/assistant/hooks/useAIPlan';
 import { useAutoGenerate } from '@/features/assistant/hooks/useAutoGenerate';
 import { usePlanActions } from '@/features/assistant/hooks/usePlanActions';
 import { useCurrentEvent } from '@/features/events/hooks/useCurrentEvent';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import type { CelebrationEvent } from '@/types';
-
-type AIPlanState = ReturnType<typeof useAIPlan>;
 
 interface AssistantSectionProps {
   ai: AIPlanState;

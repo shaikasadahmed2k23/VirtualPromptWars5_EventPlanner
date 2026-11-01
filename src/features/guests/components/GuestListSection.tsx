@@ -7,7 +7,7 @@ import { PAGE_SIZE } from '@/lib/constants';
 import { pluralize } from '@/lib/format';
 import type { ListFilters } from '@/lib/hooks/useListFilters';
 import { usePagination } from '@/lib/hooks/usePagination';
-import { useSelection, type Selection } from '@/lib/hooks/useSelection';
+import { type Selection, useSelection } from '@/lib/hooks/useSelection';
 import { RSVP_LABELS } from '@/lib/labels';
 import { notifyWithUndo } from '@/lib/undoToast';
 import type { Guest, RsvpStatus } from '@/types';

@@ -1,12 +1,12 @@
 import { VENDOR_CITIES } from '@/data/seed';
-import { ALL, toFilterOptions, type All, type FilterOption } from '@/lib/filterOptions';
+import { ALL, type All, type FilterOption, toFilterOptions } from '@/lib/filterOptions';
 import { VENDOR_CATEGORY_LABELS } from '@/lib/labels';
 import {
-  PRICE_TIERS,
-  VENDOR_CATEGORIES,
   type BudgetCategory,
+  PRICE_TIERS,
   type PriceTier,
   type Vendor,
+  VENDOR_CATEGORIES,
   type VendorCategory,
 } from '@/types';
 

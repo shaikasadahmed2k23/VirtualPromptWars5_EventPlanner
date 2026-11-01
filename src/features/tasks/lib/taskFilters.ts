@@ -1,6 +1,6 @@
-import { ALL, toFilterOptions, type All, type FilterOption } from '@/lib/filterOptions';
-import { TASK_CATEGORY_LABELS, TASK_PRIORITY_LABELS } from '@/lib/labels';
 import { TASK_CATEGORIES, TASK_PRIORITIES } from '@shared/domain';
+import { ALL, type All, type FilterOption, toFilterOptions } from '@/lib/filterOptions';
+import { TASK_CATEGORY_LABELS, TASK_PRIORITY_LABELS } from '@/lib/labels';
 import type { ISODate, Task, TaskCategory, TaskPriority } from '@/types';
 import { isTaskOverdue } from './taskStats';
 

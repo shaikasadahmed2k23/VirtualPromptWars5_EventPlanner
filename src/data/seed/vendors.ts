@@ -1,5 +1,5 @@
-import { PHOTOS, type PhotoKey } from '@/data/photos';
-import type { Vendor, VendorCategory, PriceTier } from '@/types';
+import { type PhotoKey, PHOTOS } from '@/data/photos';
+import type { PriceTier, Vendor, VendorCategory } from '@/types';
 
 type VendorSeed = Omit<Vendor, 'id' | 'photoId'> & { photoId: PhotoKey };
 

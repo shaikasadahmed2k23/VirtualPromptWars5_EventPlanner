@@ -1,21 +1,21 @@
 import type { ZodType } from 'zod';
 import {
-  aiPlanSchema,
-  themesResponseSchema,
   type AIPlan,
+  aiPlanSchema,
   type EventBrief,
   type ThemesResponse,
+  themesResponseSchema,
 } from '../../shared/ai.js';
 import type { AIMode } from '../../shared/api.js';
 import { hashValue } from '../../shared/hash.js';
 import type { TtlLruCache } from '../lib/cache.js';
-import type { Logger } from '../lib/logger.js';
 import { HTTP_STATUS, statusOf } from '../lib/errors.js';
+import type { Logger } from '../lib/logger.js';
 import { demoContent } from './demo.js';
 import type { ModelClient } from './gemini.js';
+import { parseModelJson, raceAbort } from './modelOutput.js';
 import { PLAN_MODEL_SCHEMA, THEMES_MODEL_SCHEMA } from './modelSchemas.js';
 import { buildPlanPrompt, buildRefinePrompt, buildThemesPrompt, SYSTEM_INSTRUCTION } from './prompts.js';
-import { parseModelJson, raceAbort } from './modelOutput.js';
 
 /** Result of an AI operation, with provenance. */
 export interface AIResult<T> {

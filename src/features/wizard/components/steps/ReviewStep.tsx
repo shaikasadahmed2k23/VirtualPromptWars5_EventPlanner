@@ -1,9 +1,9 @@
 import { ArrowLeft, Pencil, Sparkles } from 'lucide-react';
-import { useId, type ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 import { Button } from '@/components/ui/button';
-import { useFocusOnMount } from '@/lib/hooks/useFocusOnMount';
 import { formatDisplayDate } from '@/lib/dates';
 import { formatCurrency, pluralize } from '@/lib/format';
+import { useFocusOnMount } from '@/lib/hooks/useFocusOnMount';
 import { CURRENCY_LABELS, DIETARY_LABELS, EVENT_STYLE_LABELS, EVENT_TYPE_LABELS } from '@/lib/labels';
 import type { WizardDraft } from '../../lib/wizardSchema';
 import { WIZARD_STEPS } from '../../lib/wizardSteps';

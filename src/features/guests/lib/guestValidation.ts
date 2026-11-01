@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { GUEST_DIETARY, GUEST_GROUPS, RSVP_STATUSES, type GuestInput } from '@/types';
 import { LIMITS } from '@shared/limits';
+import { GUEST_DIETARY, GUEST_GROUPS, type GuestInput, RSVP_STATUSES } from '@/types';
 
 const PHONE_PATTERN = /^[+0-9()\-\s]*$/;
 

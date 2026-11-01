@@ -1,4 +1,4 @@
-import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import { FloralSprig } from '@/components/decor/FloralSprig';
 import { PageHeader } from '@/components/ui/headings';
 import { WizardProgress } from '@/features/wizard/components/WizardProgress';

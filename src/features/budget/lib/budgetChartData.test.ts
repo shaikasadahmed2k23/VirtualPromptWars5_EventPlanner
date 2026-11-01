@@ -1,6 +1,6 @@
-import { computeBudgetSummary } from './budgetSummary';
-import { toBudgetChartData } from './budgetChartData';
 import type { BudgetItem } from '@/types';
+import { toBudgetChartData } from './budgetChartData';
+import { computeBudgetSummary } from './budgetSummary';
 
 const item = (overrides: Partial<BudgetItem>): BudgetItem => ({
   id: '1',

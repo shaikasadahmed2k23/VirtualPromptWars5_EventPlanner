@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { COUNTDOWN_TICK_MS } from '@/lib/constants';
-import { getCountdown, type Countdown } from '@/lib/countdown';
+import { type Countdown, getCountdown } from '@/lib/countdown';
 
 /**
  * Live countdown to `target`, re-computed every {@link COUNTDOWN_TICK_MS}.

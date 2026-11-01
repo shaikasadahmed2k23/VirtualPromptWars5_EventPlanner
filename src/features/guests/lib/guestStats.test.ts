@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { computeGuestStats } from './guestStats';
 import type { Guest } from '@/types';
+import { computeGuestStats } from './guestStats';
 
 const guest = (overrides: Partial<Guest>): Guest => ({
   id: 'guest',

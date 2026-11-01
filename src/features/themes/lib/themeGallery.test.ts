@@ -1,5 +1,5 @@
-import { PHOTO_TAGS } from '@/data/photoTags';
 import { PHOTOS } from '@/data/photos';
+import { PHOTO_TAGS } from '@/data/photoTags';
 import { readableTextOn } from '@/lib/contrast';
 import { GALLERY_SIZE, selectThemePhotos } from './themeGallery';
 

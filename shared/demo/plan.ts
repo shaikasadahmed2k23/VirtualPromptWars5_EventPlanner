@@ -1,7 +1,7 @@
 import type { AIPlan, EventBrief } from '../ai.js';
 import { BUDGET_WEIGHTS } from '../budgetWeights.js';
 import { BUDGET_CATEGORIES } from '../domain.js';
-import { deriveDemoContext, type DemoContext } from './context.js';
+import { type DemoContext, deriveDemoContext } from './context.js';
 import { buildDemoMenu } from './menu.js';
 import {
   BUDGET_DECOR,

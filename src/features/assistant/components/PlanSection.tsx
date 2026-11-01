@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { useId, type ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PlanSectionProps {

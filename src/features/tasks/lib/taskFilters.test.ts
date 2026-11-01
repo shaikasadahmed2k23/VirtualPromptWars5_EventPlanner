@@ -1,5 +1,5 @@
-import { filterAndSortTasks } from './taskFilters';
 import type { Task } from '@/types';
+import { filterAndSortTasks } from './taskFilters';
 
 const tasks: Task[] = [
   {

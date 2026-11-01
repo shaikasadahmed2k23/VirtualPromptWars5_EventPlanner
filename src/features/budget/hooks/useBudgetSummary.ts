@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { filterByEventId } from '@/lib/collection';
 import type { BudgetCategory, BudgetItem, BudgetSummary, CelebrationEvent } from '@/types';
-import { toBudgetChartData, type BudgetChartRow } from '../lib/budgetChartData';
+import { type BudgetChartRow, toBudgetChartData } from '../lib/budgetChartData';
 import { computeBudgetSummary, groupItemsByCategory } from '../lib/budgetSummary';
 import { useBudgetStore } from '../store/useBudgetStore';
 

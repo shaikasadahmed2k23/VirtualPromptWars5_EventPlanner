@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { filterAndSortGuests } from './guestFilters';
 import type { Guest } from '@/types';
+import { filterAndSortGuests } from './guestFilters';
 
 const guest = (name: string, rsvp: Guest['rsvp'], group: Guest['group'] = 'friends'): Guest => ({
   id: name,

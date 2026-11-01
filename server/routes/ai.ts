@@ -1,6 +1,6 @@
-import { Router, type Response } from 'express';
+import { type Response, Router } from 'express';
 import { planRequestSchema, refineRequestSchema, themesRequestSchema } from '../../shared/ai.js';
-import { API_ROUTES, type AIResponseBody, type HealthBody } from '../../shared/api.js';
+import { type AIResponseBody, API_ROUTES, type HealthBody } from '../../shared/api.js';
 import { withValidatedBody } from '../middleware/validate.js';
 import type { AIResult, AIService } from '../services/aiService.js';
 
