@@ -1,5 +1,5 @@
 import { EVENT_TYPES } from '@shared/domain';
-import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
+import { EVENT_TYPE_META } from '@/features/events/components/eventTypeMeta';
 import { EVENT_TYPE_LABELS } from '@/lib/labels';
 import { useStepForm } from '../../hooks/useStepForm';
 import { typeStepSchema, type TypeStepValues } from '../../lib/wizardSchema';

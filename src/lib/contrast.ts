@@ -15,7 +15,7 @@ function channelToLinear(channel: number): number {
 }
 
 /** Relative luminance of a `#RRGGBB` colour, per WCAG 2.x. */
-export function relativeLuminance(hex: string): number {
+function relativeLuminance(hex: string): number {
   const match = HEX_PATTERN.exec(hex);
   if (!match?.[1]) throw new Error(`Expected a #RRGGBB colour, received "${hex}"`);
   const value = parseInt(match[1], 16);

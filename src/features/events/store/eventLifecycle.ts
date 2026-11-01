@@ -7,8 +7,8 @@ import { useVendorStore } from '@/features/vendors/store/useVendorStore';
 import { useWizardDraftStore } from '@/features/wizard/store/useWizardDraftStore';
 import { todayISO } from '@/lib/dates';
 import type { CelebrationEvent, Id, NewEventInput } from '@/types';
-import { useEventStore } from '../store/useEventStore';
-import { generateStarterBudget, generateStarterTasks } from './starterPlan';
+import { generateStarterBudget, generateStarterTasks } from '../lib/starterPlan';
+import { useEventStore } from './useEventStore';
 
 /** Stores holding data scoped to a single event. */
 const EVENT_SCOPED_STORES = [useTaskStore, useBudgetStore, useGuestStore, useAssistantStore] as const;

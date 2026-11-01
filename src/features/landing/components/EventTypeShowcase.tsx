@@ -4,7 +4,7 @@ import { EVENT_TYPES } from '@shared/domain';
 import { paths } from '@/app/navigation';
 import { Photo } from '@/components/ui/photo';
 import { PHOTOS } from '@/data/photos';
-import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
+import { EVENT_TYPE_META } from '@/features/events/components/eventTypeMeta';
 import { ASPECT } from '@/lib/constants';
 import { EVENT_TYPE_LABELS } from '@/lib/labels';
 import { cn } from '@/lib/utils';

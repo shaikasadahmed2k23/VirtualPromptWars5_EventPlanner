@@ -1,6 +1,6 @@
 import { useAssistantStore } from '@/features/assistant/store/useAssistantStore';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
-import { deleteEventCascade, resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { deleteEventCascade, resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { useGuestStore } from '@/features/guests/store/useGuestStore';
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';

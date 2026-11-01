@@ -7,6 +7,14 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+const PURE_LOGIC = 'Pure logic must not depend on React, UI, state, components, stores or hooks.';
+const UI_PACKAGES = ['react', 'react-dom', 'react-router-dom', 'zustand', 'sonner', 'lucide-react'].map((name) => ({
+  name,
+  message: PURE_LOGIC,
+}));
+const UI_MODULES = { group: ['**/components/**', '**/store/**', '**/hooks/**'], message: PURE_LOGIC };
+const APP_MODULES = { group: ['@/*', '**/src/**'], message: 'shared/ must not import from src/.' };
+
 export default tseslint.config(
   { ignores: ['dist', 'dist-server', 'coverage', 'node_modules'] },
   {
@@ -88,6 +96,19 @@ export default tseslint.config(
     ],
     ignores: ['**/*.test.ts', 'server/test/**'],
     rules: { '@typescript-eslint/explicit-module-boundary-types': 'error' },
+  },
+  {
+    // Layering: feature lib/ and shared/ are pure business logic. They may not
+    // reach for React, UI, stores or hooks, so they stay unit-testable in Node.
+    files: ['src/features/*/lib/**/*.ts'],
+    ignores: ['**/*.test.ts'],
+    rules: { 'no-restricted-imports': ['error', { paths: UI_PACKAGES, patterns: [UI_MODULES] }] },
+  },
+  {
+    // shared/ is also compiled into the server, so it cannot see browser-only src/ either.
+    files: ['shared/**/*.ts'],
+    ignores: ['**/*.test.ts'],
+    rules: { 'no-restricted-imports': ['error', { paths: UI_PACKAGES, patterns: [UI_MODULES, APP_MODULES] }] },
   },
   {
     files: ['**/*.{ts,tsx,js}'],

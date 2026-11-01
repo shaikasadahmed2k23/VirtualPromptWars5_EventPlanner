@@ -1,7 +1,7 @@
 import { ConfettiScatter } from '@/components/decor/ConfettiScatter';
 import { Photo } from '@/components/ui/photo';
 import { PHOTOS } from '@/data/photos';
-import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
+import { EVENT_TYPE_META } from '@/features/events/components/eventTypeMeta';
 import { ASPECT } from '@/lib/constants';
 import { combineDateTime, formatDisplayDate } from '@/lib/dates';
 import { pluralize } from '@/lib/format';

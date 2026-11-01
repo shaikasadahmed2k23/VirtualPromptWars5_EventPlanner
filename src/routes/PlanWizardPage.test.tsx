@@ -1,5 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
-import { resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';
 import { useWizardDraftStore } from '@/features/wizard/store/useWizardDraftStore';

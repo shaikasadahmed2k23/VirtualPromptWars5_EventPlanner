@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import { generateDemoThemes } from '@shared/demo/themes';
 import { toEventBrief } from '@/features/assistant/lib/toEventBrief';
-import { resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { DEMO_EVENT_ID } from '@/lib/constants';
 import { expectNoA11yViolations } from '@/test/a11y';

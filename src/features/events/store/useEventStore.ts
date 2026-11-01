@@ -10,7 +10,7 @@ import type { CelebrationEvent, Id, NewEventInput, ThemeSuggestion } from '@/typ
 import { migrateEventsV1 } from './migrations';
 
 /** Bumped when saved themes gained image keywords. */
-export const EVENT_STORE_VERSION = 2;
+const EVENT_STORE_VERSION = 2;
 
 interface EventState {
   events: CelebrationEvent[];

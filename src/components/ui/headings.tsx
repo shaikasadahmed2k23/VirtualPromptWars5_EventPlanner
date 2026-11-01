@@ -24,27 +24,3 @@ export function PageHeader({ eyebrow, title, description, actions, className }: 
     </header>
   );
 }
-
-interface SectionTitleProps {
-  title: string;
-  description?: ReactNode;
-  action?: ReactNode;
-  /** Heading element id, for `aria-labelledby` on the enclosing section. */
-  id?: string;
-  className?: string;
-}
-
-/** Section heading (`h2`) with optional description and trailing action. */
-export function SectionTitle({ title, description, action, id, className }: SectionTitleProps) {
-  return (
-    <div className={cn('flex items-end justify-between gap-4', className)}>
-      <div>
-        <h2 id={id} className="text-2xl sm:text-3xl">
-          {title}
-        </h2>
-        {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
-      </div>
-      {action}
-    </div>
-  );
-}

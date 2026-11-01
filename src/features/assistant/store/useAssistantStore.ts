@@ -7,7 +7,7 @@ import type { Id, ISODateTime, StoredPlan, StoredThemes } from '@/types';
 import { migrateAssistantV1 } from './migrations';
 
 /** Bumped when plans gained ids, provenance, save state and history. */
-export const ASSISTANT_STORE_VERSION = 2;
+const ASSISTANT_STORE_VERSION = 2;
 
 interface AssistantState {
   /** Current AI plan per event id. */

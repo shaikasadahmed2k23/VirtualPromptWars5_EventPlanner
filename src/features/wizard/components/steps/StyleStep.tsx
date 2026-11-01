@@ -1,5 +1,5 @@
 import { EVENT_STYLES } from '@shared/domain';
-import { EVENT_STYLE_DESCRIPTIONS } from '@/features/events/lib/eventTypeMeta';
+import { EVENT_STYLE_DESCRIPTIONS } from '@/features/events/components/eventTypeMeta';
 import { EVENT_STYLE_LABELS } from '@/lib/labels';
 import { useStepForm } from '../../hooks/useStepForm';
 import { styleStepSchema, type StyleStepValues } from '../../lib/wizardSchema';

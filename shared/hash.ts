@@ -7,7 +7,7 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /** JSON serialisation with sorted object keys, so equal inputs hash equally. */
-export function stableStringify(value: unknown): string {
+function stableStringify(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
   if (isPlainObject(value)) {
     const entries = Object.keys(value)
@@ -31,7 +31,7 @@ const SHIFT_32 = 4294967296;
 const HEX_RADIX = 16;
 
 /** cyrb53: a fast 53-bit string hash with good distribution, returned as hex. */
-export function hashString(input: string): string {
+function hashString(input: string): string {
   let h1 = SEED_A;
   let h2 = SEED_B;
   for (let index = 0; index < input.length; index += 1) {

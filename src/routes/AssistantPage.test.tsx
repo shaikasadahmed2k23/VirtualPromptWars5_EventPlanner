@@ -3,7 +3,7 @@ import { generateDemoPlan } from '@shared/demo/plan';
 import { toEventBrief } from '@/features/assistant/lib/toEventBrief';
 import { useAssistantStore } from '@/features/assistant/store/useAssistantStore';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
-import { resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';
 import { expectNoA11yViolations } from '@/test/a11y';

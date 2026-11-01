@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ConfirmDeleteButton, ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { PageHeader } from '@/components/ui/headings';
 import { EmptyState } from '@/components/ui/states';
-import { deleteEventCascade, resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { deleteEventCascade, resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { formatDisplayDate } from '@/lib/dates';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
@@ -53,7 +53,7 @@ function EventsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your events</CardTitle>
+        <CardTitle as="h2">Your events</CardTitle>
         <CardDescription>Deleting an event also removes its tasks, budget, guests and AI ideas.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,7 +84,7 @@ function ResetDemoCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Reset demo data</CardTitle>
+        <CardTitle as="h2">Reset demo data</CardTitle>
         <CardDescription>
           Restore Ayesha &amp; Rohan’s sample wedding with its tasks, budget, guests and AI plan. Events you created
           will be removed.

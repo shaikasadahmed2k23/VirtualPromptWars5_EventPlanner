@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
-import { resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useVendorStore } from '@/features/vendors/store/useVendorStore';
 import { DEMO_EVENT_ID, PAGE_SIZE } from '@/lib/constants';
 import { expectNoA11yViolations } from '@/test/a11y';

@@ -102,7 +102,7 @@ export function toDraftPatch(values: Record<string, unknown>): WizardDraft {
 }
 
 /** Form-step schemas in wizard order (the review step has none). */
-export const FORM_STEP_SCHEMAS = [
+const FORM_STEP_SCHEMAS = [
   typeStepSchema,
   detailsStepSchema,
   guestsBudgetStepSchema,

@@ -12,12 +12,17 @@ export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElemen
   return <div className={cn('flex flex-col gap-1.5 p-5 pb-3 sm:p-6 sm:pb-3', className)} {...props} />;
 }
 
-/** Card heading; renders an `h3` by default to keep page outlines logical. */
-export function CardTitle({ className, children, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+  /** `h3` inside a titled section (default); `h2` when the card sits directly under the page `h1`. */
+  as?: 'h2' | 'h3';
+}
+
+/** Card heading at the level that keeps the page outline unbroken. */
+export function CardTitle({ as: Heading = 'h3', className, children, ...props }: CardTitleProps) {
   return (
-    <h3 className={cn('text-xl leading-tight sm:text-2xl', className)} {...props}>
+    <Heading className={cn('text-xl leading-tight sm:text-2xl', className)} {...props}>
       {children}
-    </h3>
+    </Heading>
   );
 }
 
@@ -29,9 +34,4 @@ export function CardDescription({ className, ...props }: HTMLAttributes<HTMLPara
 /** Main card body. */
 export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('p-5 pt-0 sm:p-6 sm:pt-0', className)} {...props} />;
-}
-
-/** Card footer for actions. */
-export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex items-center gap-3 p-5 pt-0 sm:p-6 sm:pt-0', className)} {...props} />;
 }

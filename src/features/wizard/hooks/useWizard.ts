@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { paths } from '@/app/navigation';
-import { createEventWithStarterPlan } from '@/features/events/lib/eventLifecycle';
+import { createEventWithStarterPlan } from '@/features/events/store/eventLifecycle';
 import { firstInvalidStep, toNewEventInput, type WizardDraft, wizardSchema } from '../lib/wizardSchema';
 import { WIZARD_STEPS } from '../lib/wizardSteps';
 import { useWizardDraftStore } from '../store/useWizardDraftStore';

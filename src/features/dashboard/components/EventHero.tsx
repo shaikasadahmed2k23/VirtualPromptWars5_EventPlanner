@@ -4,7 +4,7 @@ import { paths } from '@/app/navigation';
 import { FloralSprig } from '@/components/decor/FloralSprig';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
+import { EVENT_TYPE_META } from '@/features/events/components/eventTypeMeta';
 import { formatDisplayDate } from '@/lib/dates';
 import { pluralize } from '@/lib/format';
 import { EVENT_STYLE_LABELS, EVENT_TYPE_LABELS } from '@/lib/labels';
