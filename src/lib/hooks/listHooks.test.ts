@@ -32,6 +32,17 @@ describe('useListFilters', () => {
     vi.useRealTimers();
   });
 
+  it('binds a filter to a { value, onChange } pair for controls', () => {
+    const { result } = renderHook(() => useListFilters(ITEMS, INITIAL, applyFilters));
+    expect(result.current.bind('minSize').value).toBe(0);
+
+    act(() => {
+      result.current.bind('minSize').onChange(3);
+    });
+    expect(result.current.bind('minSize').value).toBe(3);
+    expect(result.current.results.map((item) => item.name)).toEqual(['Marigold']);
+  });
+
   it('applies select filters immediately and debounces search', () => {
     const { result } = renderHook(() => useListFilters(ITEMS, INITIAL, applyFilters));
     expect(result.current.isFiltered).toBe(false);

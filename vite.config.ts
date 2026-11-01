@@ -53,11 +53,12 @@ export default defineConfig({
           setupFiles: [],
           include: [
             'server/**/*.test.ts',
+            'tests/**/*.test.ts',
             'shared/**/*.test.ts',
             'build/**/*.test.ts',
             'src/data/**/*.test.ts',
             'src/features/**/*.test.ts',
-            'src/lib/{collection,format}.test.ts',
+            'src/lib/{collection,format,helpers}.test.ts',
             'src/styles/**/*.test.ts',
           ],
           exclude: ['src/features/assistant/lib/assistantLib.test.ts'],
@@ -75,15 +76,36 @@ export default defineConfig({
             'src/lib/countdown.test.ts',
             'src/lib/hooks/**/*.test.ts',
             'src/lib/storage.test.ts',
+            'src/lib/browserHelpers.test.ts',
           ],
         },
       },
     ],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
-      include: ['src/lib/**', 'src/features/**/store/**', 'src/features/**/lib/**', 'shared/**', 'server/**'],
-      exclude: ['**/*.test.{ts,tsx}', 'server/index.ts', 'src/test/**'],
+      reporter: ['text-summary', 'html', 'lcov', 'json-summary'],
+      // Everything that ships, so the headline number is honest. Entry points and
+      // type-only modules have no logic to cover.
+      include: ['src/**/*.{ts,tsx}', 'shared/**/*.ts', 'server/**/*.ts'],
+      exclude: [
+        '**/*.test.{ts,tsx}',
+        'src/test/**',
+        'server/test/**',
+        'src/main.tsx',
+        'server/index.ts',
+        'src/types/**',
+      ],
+      // Measured values rounded down (Nov 2026), so CI fails on any regression.
+      // Pure logic is held to a higher bar than the overall number.
+      thresholds: {
+        statements: 97,
+        branches: 89,
+        functions: 92,
+        lines: 97,
+        'src/features/*/lib/**': { statements: 99, branches: 92, functions: 96, lines: 99 },
+        'shared/**': { statements: 100, branches: 95, functions: 100, lines: 100 },
+        'server/services/**': { statements: 99, branches: 90, functions: 93, lines: 99 },
+      },
     },
   },
 });

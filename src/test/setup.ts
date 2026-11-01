@@ -39,6 +39,7 @@ await Promise.all([
   import('@/routes/GuestsPage'),
   import('@/routes/LandingPage'),
   import('@/routes/PlanWizardPage'),
+  import('@/routes/SettingsPage'),
   import('@/routes/TasksPage'),
   import('@/routes/ThemesPage'),
   import('@/routes/VendorsPage'),

@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { resetDemoData } from '@/features/events/lib/eventLifecycle';
+import { resetDemoData } from '@/features/events/store/eventLifecycle';
 import { useEventStore } from '@/features/events/store/useEventStore';
 import { useTaskStore } from '@/features/tasks/store/useTaskStore';
 import { DEMO_EVENT_ID } from '@/lib/constants';
@@ -46,6 +46,19 @@ describe('TasksPage', () => {
     await waitFor(() =>
       expect(useTaskStore.getState().tasks.some((task) => task.title === 'Confirm final florist')).toBe(true),
     );
+  });
+
+  it('shows the same tasks grouped on the timeline view, completable from there', async () => {
+    const { user } = renderRoute(`/events/${DEMO_EVENT_ID}/tasks`);
+    await screen.findByRole('heading', { level: 1, name: /checklist & timeline/i });
+    await user.click(screen.getByRole('tab', { name: 'Timeline view' }));
+
+    const panel = screen.getByRole('tabpanel', { name: 'Timeline view' });
+    expect(within(panel).getByRole('heading', { level: 2, name: 'Event week' })).toBeInTheDocument();
+    const firstOpen = within(panel).getAllByRole('checkbox', { checked: false })[0]!;
+    const title = (firstOpen.getAttribute('aria-label') ?? '').replace(/^Mark (.+) done$/, '$1');
+    await user.click(firstOpen);
+    expect(useTaskStore.getState().tasks.find((task) => task.title === title)?.done).toBe(true);
   });
 
   it('generates a starter checklist for an empty event', async () => {
