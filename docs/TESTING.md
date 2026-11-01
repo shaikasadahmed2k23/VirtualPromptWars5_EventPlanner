@@ -1,6 +1,6 @@
 # Testing
 
-**283 tests in 40 files**, run by Vitest in two projects:
+**286 tests in 41 files**, run by Vitest in two projects:
 
 - **node:** pure logic, server and repository checks, with no DOM.
 - **dom:** page and hook tests in jsdom with Testing Library and axe.
@@ -20,7 +20,7 @@ npx vitest run src/routes/GuestsPage.test.tsx   # one file
 | ------------------------ | ----: | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Server                   |    34 | `server/*.test.ts`                           | Endpoints and envelope, Zod validation (400), body limit (413), rate limit (429), origin guard (403), CSP and security headers, Gemini retry, timeout and demo fallback, caching, prompt delimiting, SPA serving. |
 | Shared                   |    15 | `shared/**/*.test.ts`                        | Demo plan/theme generators honour the brief (vegetarian-only menus, traditions, tiers) and always validate against the shared schemas; the CSP meta and header stay in sync.                                      |
-| Feature logic and stores |    77 | `src/features/**/*.test.ts`                  | Budget maths and chart rows, timeline grouping, starter plans, filters and sorting, CSV escaping (formula injection), guest stats, plan → task/budget conversion, store migrations, exact-index undo.             |
+| Feature logic and stores |    80 | `src/features/**/*.test.ts`                  | Budget maths and chart rows, timeline grouping, starter plans, filters and sorting, CSV escaping (formula injection), guest stats, plan → task/budget conversion, store migrations, exact-index undo.             |
 | Shared helpers and hooks |    45 | `src/lib/**/*.test.ts`                       | Formatting, dates, collections, storage that never throws, countdown, list filters, pagination, selection, download and clipboard helpers.                                                                        |
 | Pages (integration)      |    49 | `src/routes/*.test.tsx`                      | The real route tree in a memory router, driven with `user-event`: wizard, dashboard, assistant, themes, budget, tasks, guests, vendors and settings, with **an axe check on every page**.                         |
 | Design tokens            |    45 | `src/styles/contrast.test.ts`                | Every text/background token pair meets WCAG AA contrast.                                                                                                                                                          |
@@ -33,7 +33,7 @@ V8 coverage over everything that ships (`src/`, `shared/`, `server/`; tests, ent
 
 | Scope                  | Statements |   Branches |  Functions |
 | ---------------------- | ---------: | ---------: | ---------: |
-| **Overall**            | **97.56%** | **89.87%** | **92.85%** |
+| **Overall**            | **97.85%** | **89.94%** | **93.58%** |
 | `src/features/*/lib`   |     99.61% |     92.06% |     96.30% |
 | `shared/`              |    100.00% |     95.56% |    100.00% |
 | `server/services`      |     99.22% |     90.00% |     93.75% |

@@ -24,9 +24,7 @@ const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 /** Number of theme options the AI returns per request. */
 export const THEME_OPTION_COUNT = 3;
 
-/* ------------------------------------------------------------------ */
-/* Responses (also sent to Gemini as the structured-output schema)    */
-/* ------------------------------------------------------------------ */
+// Responses: also sent to Gemini as the structured-output schema.
 
 /** A complete AI-generated event plan. Validated on the server AND the client. */
 export const aiPlanSchema = z.object({
@@ -88,9 +86,7 @@ export const themesResponseSchema = z.object({
 });
 export type ThemesResponse = z.infer<typeof themesResponseSchema>;
 
-/* ------------------------------------------------------------------ */
-/* Requests                                                           */
-/* ------------------------------------------------------------------ */
+// Requests: sent by the client, validated by the server.
 
 /** The subset of an event the AI needs. Sent by the client, validated by the server. */
 export const eventBriefSchema = z.object({

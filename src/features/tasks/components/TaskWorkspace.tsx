@@ -1,11 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { todayISO } from '@/lib/dates';
 import { useListFilters } from '@/lib/hooks/useListFilters';
-import { notifyWithUndo } from '@/lib/undoToast';
 import type { ISODate, Task } from '@/types';
+import { useTaskActions } from '../hooks/useTaskActions';
 import { DEFAULT_TASK_FILTERS, filterAndSortTasks } from '../lib/taskFilters';
-import { useTaskStore } from '../store/useTaskStore';
 import { TaskFilters } from './TaskFilters';
 import { TaskListView } from './TaskListView';
 import { TaskTimeline } from './TaskTimeline';
@@ -19,25 +18,10 @@ interface TaskWorkspaceProps {
 
 /** Filters plus the list and timeline views of the same filtered tasks, with stable row callbacks. */
 export function TaskWorkspace({ tasks, eventDate }: TaskWorkspaceProps) {
-  const deleteTask = useTaskStore((state) => state.deleteTask);
-  const toggleTask = useTaskStore((state) => state.toggleTask);
+  const { toggle, remove } = useTaskActions();
   const [view, setView] = useState<TaskView>('list');
   const { bind, results } = useListFilters(tasks, DEFAULT_TASK_FILTERS, filterAndSortTasks);
   const today = todayISO();
-
-  const onToggle = useCallback(
-    (task: Task) => {
-      toggleTask(task.id);
-    },
-    [toggleTask],
-  );
-
-  const onDelete = useCallback(
-    (task: Task) => {
-      notifyWithUndo(`Removed “${task.title}”`, deleteTask(task.id));
-    },
-    [deleteTask],
-  );
 
   return (
     <>
@@ -53,10 +37,10 @@ export function TaskWorkspace({ tasks, eventDate }: TaskWorkspaceProps) {
           <TabsTrigger value="timeline">Timeline view</TabsTrigger>
         </TabsList>
         <TabsContent value="list">
-          <TaskListView tasks={results} today={today} onToggle={onToggle} onDelete={onDelete} />
+          <TaskListView tasks={results} today={today} onToggle={toggle} onDelete={remove} />
         </TabsContent>
         <TabsContent value="timeline">
-          <TaskTimeline tasks={results} eventDate={eventDate} onToggle={onToggle} />
+          <TaskTimeline tasks={results} eventDate={eventDate} onToggle={toggle} />
         </TabsContent>
       </Tabs>
     </>

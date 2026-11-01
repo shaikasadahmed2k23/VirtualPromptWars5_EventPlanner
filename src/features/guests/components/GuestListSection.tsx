@@ -1,15 +1,14 @@
 import { Users } from 'lucide-react';
-import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState } from '@/components/ui/states';
 import { PAGE_SIZE } from '@/lib/constants';
 import { pluralize } from '@/lib/format';
+import { useDeleteWithUndo } from '@/lib/hooks/useDeleteWithUndo';
 import type { ListFilters } from '@/lib/hooks/useListFilters';
 import { usePagination } from '@/lib/hooks/usePagination';
 import { type Selection, useSelection } from '@/lib/hooks/useSelection';
 import { RSVP_LABELS } from '@/lib/labels';
-import { notifyWithUndo } from '@/lib/undoToast';
 import type { Guest, RsvpStatus } from '@/types';
 import type { GuestFilterOptions } from '../lib/guestFilters';
 import { useGuestStore } from '../store/useGuestStore';
@@ -27,12 +26,7 @@ interface GuestListProps {
 /** The current page of guests, or a hint when the filters match nobody. */
 function GuestList({ guests, selection }: GuestListProps) {
   const deleteGuest = useGuestStore((state) => state.deleteGuest);
-  const onDelete = useCallback(
-    (guest: Guest) => {
-      notifyWithUndo(`Removed “${guest.name}”`, deleteGuest(guest.id));
-    },
-    [deleteGuest],
-  );
+  const onDelete = useDeleteWithUndo<Guest>(deleteGuest, 'name');
 
   if (guests.length === 0) {
     return (

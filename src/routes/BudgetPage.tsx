@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback } from 'react';
+import { lazy, Suspense, useId } from 'react';
 import { BUDGET_CATEGORIES } from '@shared/domain';
 import { PageHeader } from '@/components/ui/headings';
 import { Skeleton } from '@/components/ui/states';
@@ -8,11 +8,11 @@ import { BudgetSummaryPanel } from '@/features/budget/components/BudgetSummaryPa
 import { useBudgetSummary } from '@/features/budget/hooks/useBudgetSummary';
 import { useBudgetStore } from '@/features/budget/store/useBudgetStore';
 import { useCurrentEvent } from '@/features/events/hooks/useCurrentEvent';
+import { useDeleteWithUndo } from '@/lib/hooks/useDeleteWithUndo';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
-import { notifyWithUndo } from '@/lib/undoToast';
 import type { BudgetItem } from '@/types';
 
-/* Recharts is the heaviest dependency; it loads only when the budget page renders. */
+/** Recharts is the heaviest dependency; it loads only when the budget page renders. */
 const BudgetCharts = lazy(() =>
   import('@/features/budget/components/BudgetCharts').then((module) => ({ default: module.BudgetCharts })),
 );
@@ -31,14 +31,10 @@ export default function BudgetPage() {
   const event = useCurrentEvent();
   const { itemsByCategory, summary, chartRows } = useBudgetSummary(event);
   const deleteItem = useBudgetStore((state) => state.deleteItem);
+  const linesHeadingId = useId();
   useDocumentTitle(`Budget · ${event.name}`);
 
-  const onDelete = useCallback(
-    (item: BudgetItem) => {
-      notifyWithUndo(`Removed “${item.name}”`, deleteItem(item.id));
-    },
-    [deleteItem],
-  );
+  const onDelete = useDeleteWithUndo<BudgetItem>(deleteItem, 'name');
 
   return (
     <div className="space-y-6">
@@ -52,9 +48,9 @@ export default function BudgetPage() {
       <Suspense fallback={<ChartsSkeleton />}>
         <BudgetCharts rows={chartRows} currency={event.currency} />
       </Suspense>
-      <section aria-labelledby="budget-lines-heading" className="space-y-4">
+      <section aria-labelledby={linesHeadingId} className="space-y-4">
         <div>
-          <h2 id="budget-lines-heading" className="font-serif text-2xl font-semibold">
+          <h2 id={linesHeadingId} className="font-serif text-2xl font-semibold">
             Budget lines
           </h2>
           <p className="mt-1 text-sm text-muted">Update amounts, notes and payment status inline.</p>

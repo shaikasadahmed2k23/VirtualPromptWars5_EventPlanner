@@ -15,16 +15,26 @@ interface QuoteDialogProps {
   trigger: ReactElement;
 }
 
+/** User-facing copy; requests are demo-only and never leave the device. */
+const QUOTE_COPY = {
+  notice: 'Demo only. The request is saved on this device; nothing is sent to the vendor.',
+  saved: 'Quote request saved on this device',
+  savedDetail: 'Demo only. Nothing was sent.',
+} as const;
+
+/** Blank request, pre-filled with the planning event's date and guest count when there is one. */
+const quoteDefaults = (event: CelebrationEvent | undefined): QuoteRequestInput => ({
+  name: '',
+  email: '',
+  eventDate: event?.date ?? '',
+  guestCount: event?.guestCount ?? 0,
+  message: '',
+});
+
 /** Request-a-quote form. Demo only: the request is stored on this device and never sent. */
 export function QuoteDialog({ vendor, event, trigger }: QuoteDialogProps) {
   const submitQuoteRequest = useVendorStore((state) => state.submitQuoteRequest);
-  const { form, open, onOpenChange, submitWith } = useDialogForm(quoteRequestSchema, (): QuoteRequestInput => ({
-    name: '',
-    email: '',
-    eventDate: event?.date ?? '',
-    guestCount: event?.guestCount ?? 0,
-    message: '',
-  }));
+  const { form, open, onOpenChange, submitWith } = useDialogForm(quoteRequestSchema, () => quoteDefaults(event));
   const {
     register,
     formState: { errors },
@@ -34,13 +44,13 @@ export function QuoteDialog({ vendor, event, trigger }: QuoteDialogProps) {
     <FormDialog
       trigger={trigger}
       title={`Request a quote from ${vendor.name}`}
-      description="Demo only. The request is saved on this device; nothing is sent to the vendor."
+      description={QUOTE_COPY.notice}
       submitLabel="Save request"
       open={open}
       onOpenChange={onOpenChange}
       onSubmit={submitWith((values) => {
         submitQuoteRequest({ ...values, vendorId: vendor.id, eventId: event?.id ?? null });
-        toast.success('Quote request saved on this device', { description: 'Demo only. Nothing was sent.' });
+        toast.success(QUOTE_COPY.saved, { description: QUOTE_COPY.savedDetail });
       })}
     >
       <Field label="Your name" required error={errors.name?.message}>

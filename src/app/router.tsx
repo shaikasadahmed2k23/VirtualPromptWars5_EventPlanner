@@ -3,7 +3,7 @@ import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { RouteError } from '@/components/layout/RouteError';
 import { RootLayout } from './RootLayout';
 
-/* Every page is its own chunk; only the shell ships in the initial bundle. */
+/** Every page is its own chunk; only the shell ships in the initial bundle. */
 const LandingPage = lazy(() => import('@/routes/LandingPage'));
 const PlanWizardPage = lazy(() => import('@/routes/PlanWizardPage'));
 const EventsIndexPage = lazy(() => import('@/routes/EventsIndexPage'));

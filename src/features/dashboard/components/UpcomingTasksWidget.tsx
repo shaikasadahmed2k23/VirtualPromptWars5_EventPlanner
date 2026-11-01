@@ -7,11 +7,10 @@ import { EmptyState } from '@/components/ui/states';
 import { WidgetCard } from '@/components/ui/widget-card';
 import { DueBadge, PriorityBadge } from '@/features/tasks/components/TaskBadges';
 import { useEventTasks } from '@/features/tasks/hooks/useEventTasks';
+import { useTaskActions } from '@/features/tasks/hooks/useTaskActions';
 import { isTaskOverdue, selectUpcomingTasks } from '@/features/tasks/lib/taskStats';
-import { useTaskStore } from '@/features/tasks/store/useTaskStore';
 import { UPCOMING_TASKS_LIMIT } from '@/lib/constants';
 import { formatDisplayDate, todayISO } from '@/lib/dates';
-import { notifyWithUndo } from '@/lib/undoToast';
 import { cn } from '@/lib/utils';
 import type { CelebrationEvent, Task } from '@/types';
 
@@ -56,16 +55,9 @@ function UpcomingTaskItem({ task, today, onComplete }: UpcomingTaskItemProps) {
 /** The next open tasks, overdue first, each completable inline (with undo). */
 export function UpcomingTasksWidget({ event, isLoading }: { event: CelebrationEvent; isLoading: boolean }) {
   const tasks = useEventTasks(event.id);
-  const toggleTask = useTaskStore((state) => state.toggleTask);
+  const { completeWithUndo } = useTaskActions();
   const upcoming = selectUpcomingTasks(tasks, UPCOMING_TASKS_LIMIT);
   const today = todayISO();
-
-  const complete = (task: Task) => {
-    toggleTask(task.id);
-    notifyWithUndo(`Marked “${task.title}” done`, () => {
-      toggleTask(task.id);
-    });
-  };
 
   return (
     <WidgetCard
@@ -96,7 +88,7 @@ export function UpcomingTasksWidget({ event, isLoading }: { event: CelebrationEv
       {upcoming.length > 0 ? (
         <ul className="divide-y divide-line">
           {upcoming.map((task) => (
-            <UpcomingTaskItem key={task.id} task={task} today={today} onComplete={complete} />
+            <UpcomingTaskItem key={task.id} task={task} today={today} onComplete={completeWithUndo} />
           ))}
         </ul>
       ) : null}

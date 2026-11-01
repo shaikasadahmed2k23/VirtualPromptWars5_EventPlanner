@@ -1,4 +1,5 @@
 import { UserRoundCheck, UserRoundPlus, UserRoundX, Users } from 'lucide-react';
+import { useId } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatCard } from '@/components/ui/stat-card';
@@ -16,9 +17,10 @@ interface GuestStatsPanelProps {
 
 /** RSVP, headcount and dietary summary cards for the guest list. */
 export function GuestStatsPanel({ stats }: GuestStatsPanelProps) {
+  const headingId = useId();
   return (
-    <section aria-labelledby="guest-overview-heading" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <h2 id="guest-overview-heading" className="sr-only">
+    <section aria-labelledby={headingId} className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <h2 id={headingId} className="sr-only">
         Guest overview
       </h2>
       <StatCard

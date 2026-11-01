@@ -1,21 +1,13 @@
-import type { ZodType } from 'zod';
-import {
-  type AIPlan,
-  aiPlanSchema,
-  type EventBrief,
-  type ThemesResponse,
-  themesResponseSchema,
-} from '../../shared/ai.js';
+import type { AIPlan, EventBrief, ThemesResponse } from '../../shared/ai.js';
 import type { AIMode } from '../../shared/api.js';
 import { hashValue } from '../../shared/hash.js';
 import type { TtlLruCache } from '../lib/cache.js';
 import { HTTP_STATUS, statusOf } from '../lib/errors.js';
 import type { Logger } from '../lib/logger.js';
-import { demoContent } from './demo.js';
+import { planTask, refineTask, type StructuredTask, themesTask } from './aiTasks.js';
 import type { ModelClient } from './gemini.js';
 import { parseModelJson, raceAbort } from './modelOutput.js';
-import { PLAN_MODEL_SCHEMA, THEMES_MODEL_SCHEMA } from './modelSchemas.js';
-import { buildPlanPrompt, buildRefinePrompt, buildThemesPrompt, SYSTEM_INSTRUCTION } from './prompts.js';
+import { SYSTEM_INSTRUCTION } from './prompts.js';
 
 /** Result of an AI operation, with provenance. */
 export interface AIResult<T> {
@@ -39,15 +31,6 @@ interface AIServiceDeps {
   timeoutMs: number;
   cache: TtlLruCache<unknown>;
   logger: Logger;
-}
-
-interface StructuredTask<T> {
-  kind: 'plan' | 'refine' | 'themes';
-  cacheInput: unknown;
-  prompt: string;
-  schema: ZodType<T>;
-  modelSchema: object;
-  demo: () => T;
 }
 
 /** What one model call produced: valid data, a reason to try again, or a reason to give up. */
@@ -104,33 +87,6 @@ async function attemptOnce<T>(
     : { type: 'retry', event: 'ai_malformed_output', reason: 'malformed_output', status: null };
 }
 
-const planTask = (brief: EventBrief): StructuredTask<AIPlan> => ({
-  kind: 'plan',
-  cacheInput: brief,
-  prompt: buildPlanPrompt(brief),
-  schema: aiPlanSchema,
-  modelSchema: PLAN_MODEL_SCHEMA,
-  demo: () => demoContent.plan(brief),
-});
-
-const refineTask = (brief: EventBrief, plan: AIPlan, instruction: string): StructuredTask<AIPlan> => ({
-  kind: 'refine',
-  cacheInput: { brief, plan, instruction },
-  prompt: buildRefinePrompt(brief, plan, instruction),
-  schema: aiPlanSchema,
-  modelSchema: PLAN_MODEL_SCHEMA,
-  demo: () => demoContent.refine(brief, instruction),
-});
-
-const themesTask = (brief: EventBrief): StructuredTask<ThemesResponse> => ({
-  kind: 'themes',
-  cacheInput: brief,
-  prompt: buildThemesPrompt(brief),
-  schema: themesResponseSchema,
-  modelSchema: THEMES_MODEL_SCHEMA,
-  demo: () => demoContent.themes(brief),
-});
-
 /**
  * Orchestrates every AI request: cache → Gemini (structured output) → shared
  * Zod validation → one retry on malformed output or a transient provider error
@@ -150,7 +106,7 @@ export function createAIService({ client, model, timeoutMs, cache, logger }: AIS
     if (hit.success) return { data: hit.data, aiMode: 'live', cached: true };
 
     const signal = AbortSignal.timeout(timeoutMs);
-    let lastFailure = { reason: 'malformed_output', status: null as number | null };
+    let lastFailure: { reason: string; status: number | null } = { reason: 'malformed_output', status: null };
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
       const outcome = await attemptOnce(client, task, signal);
       if (outcome.type === 'success') {

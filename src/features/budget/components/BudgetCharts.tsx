@@ -33,6 +33,13 @@ const X_AXIS_LABEL_ANGLE = -25;
 const X_AXIS_HEIGHT = 65;
 const BAR_RADIUS: [number, number, number, number] = [4, 4, 0, 0];
 
+/** Amount columns of the table alternative, in display order. */
+const AMOUNT_COLUMNS = [
+  { key: 'estimated', label: 'Estimated' },
+  { key: 'actual', label: 'Actual' },
+  { key: 'forecast', label: 'Forecast' },
+] as const satisfies readonly { key: keyof BudgetChartRow; label: string }[];
+
 interface BudgetChartsProps {
   rows: readonly BudgetChartRow[];
   currency: CurrencyCode;
@@ -47,15 +54,11 @@ function BudgetTable({ rows, currency }: BudgetChartsProps) {
           <th scope="col" className="pb-2 font-medium">
             Category
           </th>
-          <th scope="col" className="pb-2 text-right font-medium">
-            Estimated
-          </th>
-          <th scope="col" className="pb-2 text-right font-medium">
-            Actual
-          </th>
-          <th scope="col" className="pb-2 text-right font-medium">
-            Forecast
-          </th>
+          {AMOUNT_COLUMNS.map((column) => (
+            <th key={column.key} scope="col" className="pb-2 text-right font-medium">
+              {column.label}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
@@ -64,9 +67,11 @@ function BudgetTable({ rows, currency }: BudgetChartsProps) {
             <th scope="row" className="py-2 font-medium">
               {row.label}
             </th>
-            <td className="py-2 text-right">{formatCurrency(row.estimated, currency)}</td>
-            <td className="py-2 text-right">{formatCurrency(row.actual, currency)}</td>
-            <td className="py-2 text-right">{formatCurrency(row.forecast, currency)}</td>
+            {AMOUNT_COLUMNS.map((column) => (
+              <td key={column.key} className="py-2 text-right">
+                {formatCurrency(row[column.key], currency)}
+              </td>
+            ))}
           </tr>
         ))}
       </tbody>
