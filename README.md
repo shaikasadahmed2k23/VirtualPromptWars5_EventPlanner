@@ -189,7 +189,7 @@ One container serves the SPA and the API from the same origin. The
 - **No accounts or sync.** Plans live in one browser's `localStorage`; clearing site data or switching devices loses them. There is no sharing with a partner or planner yet.
 - **Sample vendors.** The directory is curated sample data with placeholder contacts; "Request quote" records the request locally and contacts no one.
 - **AI quality varies.** Gemini output is schema-validated, so it is always well-formed, but taste and accuracy (prices, local customs) still need a human eye. Demo mode is deterministic and less personal.
-- **Known advisory.** `npm audit` reports a high-severity advisory in zod 3 (GHSA-mrhx-c7xc-m3w5, memory use when validating oversized collections). The fix is zod 4, a breaking migration not done yet. Exposure is limited because request bodies are capped at 16 KB before Zod runs. **The CI audit step fails until then**; it is deliberately not silenced.
+- **Known advisory.** `npm audit` reports a high-severity advisory in zod 3 (GHSA-mrhx-c7xc-m3w5, memory use when validating oversized collections). The fix is zod 4, a breaking migration planned as the next step. Exposure is low because request bodies are capped at 16 KB before Zod runs; see [SECURITY.md](SECURITY.md#known-advisories--accepted-risk). Until then the CI audit step is informational (`continue-on-error`), so it reports but does not block.
 - **Cold starts.** The free Render instance sleeps when idle, so the first request after a while is slow.
 - **Testing gaps.** Phone-width (375 px) layout is checked manually and only on the Landing, Wizard, Dashboard and Assistant pages. Colour contrast is verified on design tokens and in a real-browser audit, not in jsdom.
 

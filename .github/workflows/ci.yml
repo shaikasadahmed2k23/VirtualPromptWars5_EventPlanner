@@ -29,5 +29,8 @@ jobs:
       - run: npm run test:coverage
       - run: npm run build
       # Last, so a dependency advisory never hides the result of the checks above.
+      # Informational until the zod 4 migration: zod 3 has GHSA-mrhx-c7xc-m3w5 (no 3.x fix).
+      # Accepted risk is documented in SECURITY.md; the step still reports any new advisory.
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true

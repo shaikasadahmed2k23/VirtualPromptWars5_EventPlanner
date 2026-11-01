@@ -23,7 +23,33 @@ worth protecting, and from whom:
 | Clickjacking, sniffing | Framing or MIME confusion                                | helmet: `frame-ancestors 'none'` / `X-Frame-Options`, `nosniff`, HSTS, strict referrer policy, COOP; `x-powered-by` disabled.                                                                                                   |
 | CSV formula injection  | A guest name such as `=HYPERLINK(...)` executed in Excel | `escapeCsvCell` prefixes cells that start with `=`, `+`, `-` or `@`.                                                                                                                                                            |
 | Information disclosure | Stack traces or internals in responses                   | One error shape (`ApiError` → `{ error: { code, message } }`); unknown errors become a generic 500. `/api/health` reports only `status` and `aiMode`.                                                                           |
-| Supply chain           | Vulnerable production dependencies                       | CI runs `npm audit --omit=dev --audit-level=high`; the Docker runtime installs production dependencies only.                                                                                                                    |
+| Supply chain           | Vulnerable production dependencies                       | CI runs `npm audit --omit=dev --audit-level=high` (informational until the zod 4 migration, see below); the Docker runtime installs production dependencies only.                                                               |
+
+## Known advisories / accepted risk
+
+### zod 3: GHSA-mrhx-c7xc-m3w5 (high)
+
+Zod below 4.6.6 can use excessive memory when validating very large
+collections against constrained schemas. There is no patched 3.x release; the
+fix is zod 4.
+
+**Why the risk is low here:**
+
+- **Size is capped before Zod runs.** `express.json({ limit: LIMITS.requestBodyBytes })`
+  rejects any body over 16 KB with a 413 before validation starts
+  (`server/app.ts`, `shared/limits.ts`). An attacker cannot hand Zod an
+  oversized collection.
+- **Every field is bounded.** The request schemas cap string lengths, numbers
+  and array sizes (`shared/limits.ts`, a `.max()` or fixed `.length()` on every array in
+  `shared/ai.ts`) and reject unknown keys.
+- **Untrusted input is parsed on the server only.** The browser uses Zod on
+  its own form input and on responses from this server, not on third-party data.
+- **Rate limiting** (20 requests/min/IP) bounds repeated attempts.
+
+**Planned fix:** migrate to zod 4 (with `@hookform/resolvers` and native
+JSON-schema output replacing `zod-to-json-schema`), tracked as the next step.
+Until then the CI audit step is informational (`continue-on-error: true`). It
+still runs on every push and will show any new advisory.
 
 ## Out of scope
 
