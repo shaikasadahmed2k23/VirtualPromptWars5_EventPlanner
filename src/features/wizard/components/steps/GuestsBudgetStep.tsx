@@ -1,6 +1,6 @@
 import { CURRENCIES } from '@shared/domain';
 import { Field } from '@/components/ui/field';
-import { Input, Select } from '@/components/ui/input';
+import { Input, LabelledOptions, Select } from '@/components/ui/input';
 import { formatCurrency } from '@/lib/format';
 import { CURRENCY_LABELS } from '@/lib/labels';
 import { useStepForm } from '../../hooks/useStepForm';
@@ -54,11 +54,7 @@ export function GuestsBudgetStep({ draft, onComplete, onBack, focusHeading }: St
         <Field label="Currency" required error={errors.currency?.message}>
           {(props) => (
             <Select {...props} {...register('currency')}>
-              {CURRENCIES.map((code) => (
-                <option key={code} value={code}>
-                  {CURRENCY_LABELS[code]}
-                </option>
-              ))}
+              <LabelledOptions values={CURRENCIES} labels={CURRENCY_LABELS} />
             </Select>
           )}
         </Field>

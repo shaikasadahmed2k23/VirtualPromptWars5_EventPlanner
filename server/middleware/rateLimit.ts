@@ -1,6 +1,12 @@
 import type { RequestHandler } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { sendError } from '../lib/errors.js';
+import { ApiError, HTTP_STATUS, sendError } from '../lib/errors.js';
+
+const RATE_LIMITED = new ApiError(
+  HTTP_STATUS.tooManyRequests,
+  'RATE_LIMITED',
+  'Too many requests. Please wait a minute and try again.',
+);
 
 /** Per-IP request limit for the API, answered in the shared error shape. */
 export function apiRateLimit({ windowMs, max }: { windowMs: number; max: number }): RequestHandler {
@@ -10,7 +16,7 @@ export function apiRateLimit({ windowMs, max }: { windowMs: number; max: number 
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     handler: (_req, res) => {
-      sendError(res, 429, 'RATE_LIMITED', 'Too many requests. Please wait a minute and try again.');
+      sendError(res, RATE_LIMITED);
     },
   });
 }

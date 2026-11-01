@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react';
 import { useState, type ReactElement } from 'react';
 import { Button } from './button';
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from './dialog';
@@ -44,5 +45,25 @@ export function ConfirmDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface ConfirmDeleteButtonProps extends Omit<ConfirmDialogProps, 'trigger' | 'destructive'> {
+  /** Names the thing being deleted in the button's accessible label, e.g. `Delete Priya`. */
+  itemName: string;
+}
+
+/** Trash icon button that asks for confirmation before a destructive delete. */
+export function ConfirmDeleteButton({ itemName, ...dialog }: ConfirmDeleteButtonProps) {
+  return (
+    <ConfirmDialog
+      destructive
+      trigger={
+        <Button variant="ghost" size="icon-sm" aria-label={`Delete ${itemName}`}>
+          <Trash2 aria-hidden="true" />
+        </Button>
+      }
+      {...dialog}
+    />
   );
 }

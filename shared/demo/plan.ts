@@ -45,7 +45,7 @@ export function shiftTime(time: string, offset: number): string {
   return `${pad(Math.floor(total / MINUTES_PER_HOUR))}:${pad(total % MINUTES_PER_HOUR)}`;
 }
 
-function buildConcept(context: DemoContext): AIPlan['concept'] {
+function conceptSummary(context: DemoContext): string {
   const { brief } = context;
   const place = brief.venue ? `at ${brief.venue}, ${brief.city}` : `in ${brief.city}`;
   const summary = [
@@ -58,7 +58,11 @@ function buildConcept(context: DemoContext): AIPlan['concept'] {
       ? 'Accessibility is planned in from the start: step-free routes, reserved seating and clear signage.'
       : '',
   ].filter(Boolean);
+  return summary.join(' ').slice(0, MAX_SUMMARY);
+}
 
+function conceptHighlights(context: DemoContext): string[] {
+  const { brief } = context;
   const highlights = [
     STYLE_DECOR[brief.style][0]?.title ?? 'Signature décor',
     context.vegetarianOnly ? 'A fully vegetarian feast' : 'A menu with something for every guest',
@@ -68,12 +72,16 @@ function buildConcept(context: DemoContext): AIPlan['concept'] {
     context.wantsKids ? 'Dedicated space and activities for children' : '',
     context.wantsSangeet ? 'A sangeet night full of family performances' : '',
   ].filter(Boolean);
+  return highlights.slice(0, MAX_HIGHLIGHTS);
+}
 
+function buildConcept(context: DemoContext): AIPlan['concept'] {
+  const { brief } = context;
   return {
     title: `${STYLE_ADJECTIVE[brief.style]} ${TYPE_TITLE[brief.type]} in ${brief.city}`,
     tagline: `${brief.guestCount} guests, one story, planned around a ${TIER_LABEL[context.tier]} budget.`,
-    summary: summary.join(' ').slice(0, MAX_SUMMARY),
-    highlights: highlights.slice(0, MAX_HIGHLIGHTS),
+    summary: conceptSummary(context),
+    highlights: conceptHighlights(context),
   };
 }
 

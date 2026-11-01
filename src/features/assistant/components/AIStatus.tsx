@@ -15,7 +15,7 @@ interface AIStatusProps {
  */
 export function AIStatus({ status, error, onRetry, successMessage }: AIStatusProps) {
   const loadingMessage = useLoadingStatusMessage(status === 'loading');
-  const announcement = status === 'loading' ? loadingMessage : status === 'success' ? successMessage : '';
+  const announcement = { loading: loadingMessage, success: successMessage, idle: '', error: '' }[status];
   return (
     <>
       <p className="sr-only" role="status" aria-live="polite">

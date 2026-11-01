@@ -1,10 +1,11 @@
 import { CheckCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { toPercent } from '@/lib/format';
 import type { TaskProgress } from '../lib/taskStats';
 
 /** Progress bar for completed checklist tasks with an accessible text label. */
 export function TaskProgress({ progress }: { progress: TaskProgress }) {
-  const percent = Math.round(progress.ratio * 100);
+  const percent = toPercent(progress.ratio);
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between gap-3">

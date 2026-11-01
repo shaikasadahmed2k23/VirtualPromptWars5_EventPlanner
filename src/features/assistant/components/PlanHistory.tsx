@@ -1,7 +1,7 @@
 import { History, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { formatDisplayDate } from '@/lib/dates';
+import { dateOfTimestamp, formatDisplayDate } from '@/lib/dates';
 import type { StoredPlan } from '@/types';
 import { AIModeBadge } from './AIModeBadge';
 
@@ -33,7 +33,7 @@ export function PlanHistory({ history, onRestore, disabled }: PlanHistoryProps) 
                 <div className="min-w-0">
                   <p className="truncate font-medium">{describe(version)}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                    <span>{formatDisplayDate(version.generatedAt.slice(0, 10))}</span>
+                    <span>{formatDisplayDate(dateOfTimestamp(version.generatedAt))}</span>
                     <AIModeBadge aiMode={version.aiMode} />
                   </div>
                 </div>

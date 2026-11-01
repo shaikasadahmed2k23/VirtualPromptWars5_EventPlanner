@@ -37,3 +37,17 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
   ),
 );
 Select.displayName = 'Select';
+
+interface LabelledOptionsProps<T extends string> {
+  values: readonly T[];
+  labels: Readonly<Record<T, string>>;
+}
+
+/** `<option>`s for a closed set of values, in order, each shown with its human label. */
+export function LabelledOptions<T extends string>({ values, labels }: LabelledOptionsProps<T>) {
+  return values.map((value) => (
+    <option key={value} value={value}>
+      {labels[value]}
+    </option>
+  ));
+}

@@ -8,15 +8,17 @@ import type { StepProps } from './stepProps';
 
 const DEFAULT_START_TIME = '18:00';
 
+const detailsDefaults = (draft: StepProps<DetailsStepValues>['draft']): DetailsStepValues => ({
+  name: draft.name ?? '',
+  date: draft.date ?? '',
+  startTime: draft.startTime ?? DEFAULT_START_TIME,
+  city: draft.city ?? '',
+  venue: draft.venue ?? '',
+});
+
 /** Step 2: name, date, time, city and venue. */
 export function DetailsStep({ draft, onComplete, onBack, focusHeading }: StepProps<DetailsStepValues>) {
-  const { register, handleSubmit, formState } = useStepForm(detailsStepSchema, {
-    name: draft.name ?? '',
-    date: draft.date ?? '',
-    startTime: draft.startTime ?? DEFAULT_START_TIME,
-    city: draft.city ?? '',
-    venue: draft.venue ?? '',
-  });
+  const { register, handleSubmit, formState } = useStepForm(detailsStepSchema, detailsDefaults(draft));
   const { errors } = formState;
 
   return (

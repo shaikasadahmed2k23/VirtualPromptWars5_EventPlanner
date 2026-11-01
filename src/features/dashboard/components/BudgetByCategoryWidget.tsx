@@ -5,9 +5,41 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/states';
 import { WidgetCard } from '@/components/ui/widget-card';
 import { useBudgetSummary } from '@/features/budget/hooks/useBudgetSummary';
-import { formatCurrency } from '@/lib/format';
+import { formatCurrency, PERCENT } from '@/lib/format';
 import { BUDGET_CATEGORY_LABELS } from '@/lib/labels';
-import type { CelebrationEvent } from '@/types';
+import type { CategoryTotal, CelebrationEvent } from '@/types';
+
+interface CategoryBarProps {
+  row: CategoryTotal;
+  /** The largest amount across rows, so every bar shares one scale. */
+  scale: number;
+  money: (amount: number) => string;
+}
+
+/** One category: a text label (the accessible value) over decorative estimated/actual bars. */
+function CategoryBar({ row, scale, money }: CategoryBarProps) {
+  return (
+    <li>
+      <div className="flex items-baseline justify-between gap-3 text-sm">
+        <span className="font-medium">{BUDGET_CATEGORY_LABELS[row.category]}</span>
+        <span className="text-muted">
+          {money(row.actual)} spent <span aria-hidden="true">/</span>
+          <span className="sr-only">of</span> {money(row.estimated)}
+        </span>
+      </div>
+      <div className="relative mt-1.5 h-2 rounded-full bg-ivory-deep" aria-hidden="true">
+        <div
+          className="absolute inset-y-0 left-0 rounded-full bg-blush"
+          style={{ width: `${(row.estimated / scale) * PERCENT}%` }}
+        />
+        <div
+          className={`absolute inset-y-0 left-0 rounded-full ${row.actual > row.estimated ? 'bg-danger' : 'bg-rose-ink'}`}
+          style={{ width: `${(row.actual / scale) * PERCENT}%` }}
+        />
+      </div>
+    </li>
+  );
+}
 
 /** Estimated vs actual spend per category as accessible text-labelled bars. */
 export function BudgetByCategoryWidget({ event, isLoading }: { event: CelebrationEvent; isLoading: boolean }) {
@@ -47,25 +79,7 @@ export function BudgetByCategoryWidget({ event, isLoading }: { event: Celebratio
       ) : (
         <ul className="space-y-3">
           {rows.map((row) => (
-            <li key={row.category}>
-              <div className="flex items-baseline justify-between gap-3 text-sm">
-                <span className="font-medium">{BUDGET_CATEGORY_LABELS[row.category]}</span>
-                <span className="text-muted">
-                  {money(row.actual)} spent <span aria-hidden="true">/</span>
-                  <span className="sr-only">of</span> {money(row.estimated)}
-                </span>
-              </div>
-              <div className="relative mt-1.5 h-2 rounded-full bg-ivory-deep" aria-hidden="true">
-                <div
-                  className="absolute inset-y-0 left-0 rounded-full bg-blush"
-                  style={{ width: `${(row.estimated / scale) * 100}%` }}
-                />
-                <div
-                  className={`absolute inset-y-0 left-0 rounded-full ${row.actual > row.estimated ? 'bg-danger' : 'bg-rose-ink'}`}
-                  style={{ width: `${(row.actual / scale) * 100}%` }}
-                />
-              </div>
-            </li>
+            <CategoryBar key={row.category} row={row} scale={scale} money={money} />
           ))}
         </ul>
       )}

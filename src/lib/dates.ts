@@ -55,9 +55,18 @@ export function shiftISODate(date: ISODate, days: number): ISODate {
   return parsed ? toISODate(addDays(parsed, days)) : date;
 }
 
+/** Lengths of the `YYYY-MM-DD` and `YYYY-MM` prefixes of an ISO timestamp. */
+const ISO_DATE_LENGTH = 10;
+const ISO_MONTH_LENGTH = 7;
+
 /** `YYYY-MM` key used to group dates by calendar month. */
 export function monthKey(date: ISODate): string {
-  return date.slice(0, 7);
+  return date.slice(0, ISO_MONTH_LENGTH);
+}
+
+/** Calendar date part of an ISO timestamp, without any time-zone conversion. */
+export function dateOfTimestamp(timestamp: ISODateTime): ISODate {
+  return timestamp.slice(0, ISO_DATE_LENGTH);
 }
 
 /** Shifts a calendar date by whole `months` (negative moves backwards). */

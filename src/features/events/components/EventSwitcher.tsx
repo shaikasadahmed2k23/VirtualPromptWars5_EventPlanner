@@ -10,6 +10,25 @@ import { useEventStore } from '../store/useEventStore';
 const itemClass =
   'flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none data-[highlighted]:bg-ivory-deep';
 
+interface EventMenuItemProps {
+  event: CelebrationEvent;
+  isCurrent: boolean;
+  onSelect: () => void;
+}
+
+/** An event in the switcher: a tick for the current one, then its name and date. */
+function EventMenuItem({ event, isCurrent, onSelect }: EventMenuItemProps) {
+  return (
+    <DropdownMenu.Item className={itemClass} onSelect={onSelect}>
+      <Check className={cn('size-4 text-rose-ink', !isCurrent && 'invisible')} aria-hidden="true" />
+      <span className="min-w-0">
+        <span className="block truncate font-medium">{event.name}</span>
+        <span className="block text-xs text-muted">{formatDisplayDate(event.date)}</span>
+      </span>
+    </DropdownMenu.Item>
+  );
+}
+
 /** Dropdown to jump between events or start a new one. Keyboard accessible via Radix. */
 export function EventSwitcher({ current }: { current: CelebrationEvent }) {
   const events = useEventStore((state) => state.events);
@@ -34,22 +53,14 @@ export function EventSwitcher({ current }: { current: CelebrationEvent }) {
             Your events
           </DropdownMenu.Label>
           {events.map((event) => (
-            <DropdownMenu.Item
+            <EventMenuItem
               key={event.id}
-              className={itemClass}
+              event={event}
+              isCurrent={event.id === current.id}
               onSelect={() => {
                 void navigate(paths.event(event.id));
               }}
-            >
-              <Check
-                className={cn('size-4 text-rose-ink', event.id !== current.id && 'invisible')}
-                aria-hidden="true"
-              />
-              <span className="min-w-0">
-                <span className="block truncate font-medium">{event.name}</span>
-                <span className="block text-xs text-muted">{formatDisplayDate(event.date)}</span>
-              </span>
-            </DropdownMenu.Item>
+            />
           ))}
           <DropdownMenu.Separator className="my-1 h-px bg-line" />
           <DropdownMenu.Item

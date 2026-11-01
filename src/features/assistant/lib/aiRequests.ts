@@ -31,12 +31,18 @@ const CLIENT_FALLBACK_CODES: ReadonlySet<ClientErrorCode> = new Set([
   'INTERNAL_ERROR',
 ]);
 
+/** One AI endpoint call: what to send, how to validate it, and the local demo equivalent. */
+interface AIRequestSpec<T> {
+  /** Cache namespace. */
+  kind: string;
+  path: string;
+  body: unknown;
+  schema: ZodType<T>;
+  demo: () => T;
+}
+
 async function requestWithFallback<T>(
-  kind: string,
-  path: string,
-  body: unknown,
-  schema: ZodType<T>,
-  demo: () => T,
+  { kind, path, body, schema, demo }: AIRequestSpec<T>,
   { signal, force = false }: RequestOptions,
 ): Promise<AIOutcome<T>> {
   const key = aiCacheKey(kind, body);
@@ -57,7 +63,10 @@ async function requestWithFallback<T>(
 
 /** Generates a full plan for the event. */
 export function requestPlan(brief: EventBrief, options: RequestOptions = {}): Promise<AIOutcome<AIPlan>> {
-  return requestWithFallback('plan', API_ROUTES.plan, { brief }, aiPlanSchema, () => generateDemoPlan(brief), options);
+  return requestWithFallback(
+    { kind: 'plan', path: API_ROUTES.plan, body: { brief }, schema: aiPlanSchema, demo: () => generateDemoPlan(brief) },
+    options,
+  );
 }
 
 /** Revises an existing plan according to one instruction. */
@@ -68,11 +77,13 @@ export function requestRefinedPlan(
   options: RequestOptions = {},
 ): Promise<AIOutcome<AIPlan>> {
   return requestWithFallback(
-    'refine',
-    API_ROUTES.refine,
-    { brief, plan, instruction },
-    aiPlanSchema,
-    () => generateDemoPlan(brief, [instruction]),
+    {
+      kind: 'refine',
+      path: API_ROUTES.refine,
+      body: { brief, plan, instruction },
+      schema: aiPlanSchema,
+      demo: () => generateDemoPlan(brief, [instruction]),
+    },
     options,
   );
 }
@@ -80,11 +91,13 @@ export function requestRefinedPlan(
 /** Generates three theme options for the event. */
 export function requestThemes(brief: EventBrief, options: RequestOptions = {}): Promise<AIOutcome<ThemesResponse>> {
   return requestWithFallback(
-    'themes',
-    API_ROUTES.themes,
-    { brief },
-    themesResponseSchema,
-    () => generateDemoThemes(brief),
+    {
+      kind: 'themes',
+      path: API_ROUTES.themes,
+      body: { brief },
+      schema: themesResponseSchema,
+      demo: () => generateDemoThemes(brief),
+    },
     options,
   );
 }

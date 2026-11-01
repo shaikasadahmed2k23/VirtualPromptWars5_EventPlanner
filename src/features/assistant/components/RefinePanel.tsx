@@ -1,6 +1,6 @@
 import { LIMITS } from '@shared/limits';
 import { Wand2 } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
@@ -12,9 +12,31 @@ interface RefinePanelProps {
   disabled: boolean;
 }
 
+/** One-tap refinements; each sends its text straight to the planner. */
+function SuggestionChips({ onRefine, disabled }: RefinePanelProps) {
+  return (
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Suggested refinements">
+      {REFINE_SUGGESTIONS.map((suggestion) => (
+        <Button
+          key={suggestion}
+          variant="secondary"
+          size="sm"
+          disabled={disabled}
+          onClick={() => {
+            onRefine(suggestion);
+          }}
+        >
+          {suggestion}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 /** Chat-style box for asking the AI to adjust the current plan. */
 export function RefinePanel({ onRefine, disabled }: RefinePanelProps) {
   const [instruction, setInstruction] = useState('');
+  const titleId = useId();
   const trimmed = instruction.trim();
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -26,28 +48,14 @@ export function RefinePanel({ onRefine, disabled }: RefinePanelProps) {
 
   return (
     <Card className="p-5 sm:p-6">
-      <form onSubmit={submit} aria-labelledby="refine-title" className="space-y-4">
+      <form onSubmit={submit} aria-labelledby={titleId} className="space-y-4">
         <div>
-          <h2 id="refine-title" className="text-2xl">
+          <h2 id={titleId} className="text-2xl">
             Refine your plan
           </h2>
           <p className="text-sm text-muted">Tell the planner what to change. Your current plan is kept in history.</p>
         </div>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Suggested refinements">
-          {REFINE_SUGGESTIONS.map((suggestion) => (
-            <Button
-              key={suggestion}
-              variant="secondary"
-              size="sm"
-              disabled={disabled}
-              onClick={() => {
-                onRefine(suggestion);
-              }}
-            >
-              {suggestion}
-            </Button>
-          ))}
-        </div>
+        <SuggestionChips onRefine={onRefine} disabled={disabled} />
         <Field
           label="Your request"
           hint={`${String(instruction.length)}/${String(LIMITS.refinementMax)} characters`}

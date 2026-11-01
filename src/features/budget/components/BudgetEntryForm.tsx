@@ -3,7 +3,7 @@ import { BUDGET_CATEGORIES } from '@shared/domain';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { FormDialog } from '@/components/ui/form-dialog';
-import { Input, Select, Textarea } from '@/components/ui/input';
+import { Input, LabelledOptions, Select, Textarea } from '@/components/ui/input';
 import { useDialogForm } from '@/lib/hooks/useDialogForm';
 import { BUDGET_CATEGORY_LABELS } from '@/lib/labels';
 import type { BudgetItemInput, Id } from '@/types';
@@ -54,11 +54,7 @@ export function BudgetEntryForm({ eventId }: { eventId: Id }) {
         <Field label="Category" required>
           {(props) => (
             <Select {...props} {...register('category')}>
-              {BUDGET_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {BUDGET_CATEGORY_LABELS[category]}
-                </option>
-              ))}
+              <LabelledOptions values={BUDGET_CATEGORIES} labels={BUDGET_CATEGORY_LABELS} />
             </Select>
           )}
         </Field>

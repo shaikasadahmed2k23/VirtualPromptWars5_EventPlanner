@@ -14,10 +14,29 @@ import type { CelebrationEvent } from '@/types';
 
 const RING_SIZE = 64;
 const RING_STROKE = 7;
+const STAT_COUNT = 4;
+
+/** Budget headline: a spent-ratio ring next to the amount spent of the total. */
+function BudgetSpentCard({ event }: { event: CelebrationEvent }) {
+  const { summary } = useBudgetSummary(event);
+  return (
+    <Card className="flex items-center gap-4 p-5">
+      <ProgressRing value={summary.spentRatio} label="Budget spent" size={RING_SIZE} strokeWidth={RING_STROKE}>
+        <span className="text-xs font-semibold">{formatPercent(summary.spentRatio)}</span>
+      </ProgressRing>
+      <div className="min-w-0">
+        <p className="text-sm text-muted">Budget spent</p>
+        <p className="truncate font-serif text-2xl font-semibold leading-tight">
+          {formatCurrency(summary.actual, event.currency)}
+        </p>
+        <p className="mt-1 text-xs text-muted">of {formatCurrency(event.budget, event.currency)}</p>
+      </div>
+    </Card>
+  );
+}
 
 /** Four headline metrics: budget spent, task progress, RSVPs and days to go. */
 export function DashboardStats({ event, isLoading }: { event: CelebrationEvent; isLoading: boolean }) {
-  const { summary } = useBudgetSummary(event);
   const tasks = useEventTasks(event.id);
   const progress = computeTaskProgress(tasks);
   const { stats } = useGuestStats(event.id);
@@ -27,7 +46,7 @@ export function DashboardStats({ event, isLoading }: { event: CelebrationEvent; 
   if (isLoading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-busy="true">
-        {[0, 1, 2, 3].map((key) => (
+        {Array.from({ length: STAT_COUNT }, (_, key) => (
           <Skeleton key={key} className="h-24" />
         ))}
       </div>
@@ -36,18 +55,7 @@ export function DashboardStats({ event, isLoading }: { event: CelebrationEvent; 
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <Card className="flex items-center gap-4 p-5">
-        <ProgressRing value={summary.spentRatio} label="Budget spent" size={RING_SIZE} strokeWidth={RING_STROKE}>
-          <span className="text-xs font-semibold">{formatPercent(summary.spentRatio)}</span>
-        </ProgressRing>
-        <div className="min-w-0">
-          <p className="text-sm text-muted">Budget spent</p>
-          <p className="truncate font-serif text-2xl font-semibold leading-tight">
-            {formatCurrency(summary.actual, event.currency)}
-          </p>
-          <p className="mt-1 text-xs text-muted">of {formatCurrency(event.budget, event.currency)}</p>
-        </div>
-      </Card>
+      <BudgetSpentCard event={event} />
       <StatCard
         label="Tasks done"
         value={formatPercent(progress.ratio)}

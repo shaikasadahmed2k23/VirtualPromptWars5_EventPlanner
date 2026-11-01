@@ -10,6 +10,7 @@ import type { AIMode } from '../../shared/api.js';
 import { hashValue } from '../../shared/hash.js';
 import type { TtlLruCache } from '../lib/cache.js';
 import type { Logger } from '../lib/logger.js';
+import { HTTP_STATUS, statusOf } from '../lib/errors.js';
 import { demoContent } from './demo.js';
 import type { ModelClient } from './gemini.js';
 import { PLAN_MODEL_SCHEMA, THEMES_MODEL_SCHEMA } from './modelSchemas.js';
@@ -49,11 +50,11 @@ interface StructuredTask<T> {
   demo: () => T;
 }
 
-/** HTTP status reported by the provider SDK, if any (never the message, which may echo input). */
-const providerStatus = (error: unknown): number | null =>
-  typeof error === 'object' && error !== null && typeof (error as { status?: unknown }).status === 'number'
-    ? (error as { status: number }).status
-    : null;
+/** What one model call produced: valid data, a reason to try again, or a reason to give up. */
+type AttemptOutcome<T> =
+  | { type: 'success'; data: T }
+  | { type: 'retry'; event: 'ai_transient_error' | 'ai_malformed_output'; reason: string; status: number | null }
+  | { type: 'fail'; reason: string; status: number | null };
 
 const errorName = (error: unknown): string => (error instanceof Error ? error.name : 'model_error');
 
@@ -66,10 +67,69 @@ const delay = (ms: number) =>
 const MAX_ATTEMPTS = 2;
 
 /** Provider statuses worth one more try: rate limiting and temporary overload. */
-const RETRYABLE_STATUSES: ReadonlySet<number> = new Set([429, 500, 503]);
+const RETRYABLE_STATUSES: ReadonlySet<number> = new Set([
+  HTTP_STATUS.tooManyRequests,
+  HTTP_STATUS.internalError,
+  HTTP_STATUS.serviceUnavailable,
+]);
 
 /** Pause before retrying a transient provider error. */
 const RETRY_BACKOFF_MS = 600;
+
+/** One structured-output call, classified. Never throws. */
+async function attemptOnce<T>(
+  client: ModelClient,
+  task: StructuredTask<T>,
+  signal: AbortSignal,
+): Promise<AttemptOutcome<T>> {
+  let raw: string;
+  try {
+    const request = {
+      systemInstruction: SYSTEM_INSTRUCTION,
+      prompt: task.prompt,
+      responseSchema: task.modelSchema,
+      signal,
+    };
+    raw = await raceAbort(client.generateJson(request), signal);
+  } catch (error: unknown) {
+    if (signal.aborted) return { type: 'fail', reason: 'timeout', status: null };
+    const status = statusOf(error);
+    if (status !== null && RETRYABLE_STATUSES.has(status))
+      return { type: 'retry', event: 'ai_transient_error', reason: errorName(error), status };
+    return { type: 'fail', reason: errorName(error), status };
+  }
+  const parsed = parseModelJson(raw, task.schema);
+  return parsed.success
+    ? { type: 'success', data: parsed.data }
+    : { type: 'retry', event: 'ai_malformed_output', reason: 'malformed_output', status: null };
+}
+
+const planTask = (brief: EventBrief): StructuredTask<AIPlan> => ({
+  kind: 'plan',
+  cacheInput: brief,
+  prompt: buildPlanPrompt(brief),
+  schema: aiPlanSchema,
+  modelSchema: PLAN_MODEL_SCHEMA,
+  demo: () => demoContent.plan(brief),
+});
+
+const refineTask = (brief: EventBrief, plan: AIPlan, instruction: string): StructuredTask<AIPlan> => ({
+  kind: 'refine',
+  cacheInput: { brief, plan, instruction },
+  prompt: buildRefinePrompt(brief, plan, instruction),
+  schema: aiPlanSchema,
+  modelSchema: PLAN_MODEL_SCHEMA,
+  demo: () => demoContent.refine(brief, instruction),
+});
+
+const themesTask = (brief: EventBrief): StructuredTask<ThemesResponse> => ({
+  kind: 'themes',
+  cacheInput: brief,
+  prompt: buildThemesPrompt(brief),
+  schema: themesResponseSchema,
+  modelSchema: THEMES_MODEL_SCHEMA,
+  demo: () => demoContent.themes(brief),
+});
 
 /**
  * Orchestrates every AI request: cache → Gemini (structured output) → shared
@@ -90,64 +150,25 @@ export function createAIService({ client, model, timeoutMs, cache, logger }: AIS
     if (hit.success) return { data: hit.data, aiMode: 'live', cached: true };
 
     const signal = AbortSignal.timeout(timeoutMs);
+    let lastFailure = { reason: 'malformed_output', status: null as number | null };
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
-      let raw: string;
-      try {
-        const request = {
-          systemInstruction: SYSTEM_INSTRUCTION,
-          prompt: task.prompt,
-          responseSchema: task.modelSchema,
-          signal,
-        };
-        raw = await raceAbort(client.generateJson(request), signal);
-      } catch (error: unknown) {
-        if (signal.aborted) return demo('timeout');
-        const status = providerStatus(error);
-        if (status !== null && RETRYABLE_STATUSES.has(status) && attempt < MAX_ATTEMPTS) {
-          logger.warn('ai_transient_error', { kind: task.kind, attempt, status });
-          await delay(RETRY_BACKOFF_MS);
-          continue;
-        }
-        return demo(errorName(error), status);
+      const outcome = await attemptOnce(client, task, signal);
+      if (outcome.type === 'success') {
+        cache.set(key, outcome.data);
+        return { data: outcome.data, aiMode: 'live', cached: false };
       }
-      const parsed = parseModelJson(raw, task.schema);
-      if (parsed.success) {
-        cache.set(key, parsed.data);
-        return { data: parsed.data, aiMode: 'live', cached: false };
-      }
-      logger.warn('ai_malformed_output', { kind: task.kind, attempt });
+      if (outcome.type === 'fail') return demo(outcome.reason, outcome.status);
+      lastFailure = outcome;
+      logger.warn(outcome.event, { kind: task.kind, attempt, status: outcome.status });
+      if (outcome.event === 'ai_transient_error' && attempt < MAX_ATTEMPTS) await delay(RETRY_BACKOFF_MS);
     }
-    return demo('malformed_output');
+    return demo(lastFailure.reason, lastFailure.status);
   }
 
   return {
     mode: client ? 'live' : 'demo',
-    plan: (brief) =>
-      run({
-        kind: 'plan',
-        cacheInput: brief,
-        prompt: buildPlanPrompt(brief),
-        schema: aiPlanSchema,
-        modelSchema: PLAN_MODEL_SCHEMA,
-        demo: () => demoContent.plan(brief),
-      }),
-    refine: (brief, plan, instruction) =>
-      run({
-        kind: 'refine',
-        cacheInput: { brief, plan, instruction },
-        prompt: buildRefinePrompt(brief, plan, instruction),
-        schema: aiPlanSchema,
-        modelSchema: PLAN_MODEL_SCHEMA,
-        demo: () => demoContent.refine(brief, instruction),
-      }),
-    themes: (brief) =>
-      run({
-        kind: 'themes',
-        cacheInput: brief,
-        prompt: buildThemesPrompt(brief),
-        schema: themesResponseSchema,
-        modelSchema: THEMES_MODEL_SCHEMA,
-        demo: () => demoContent.themes(brief),
-      }),
+    plan: (brief) => run(planTask(brief)),
+    refine: (brief, plan, instruction) => run(refineTask(brief, plan, instruction)),
+    themes: (brief) => run(themesTask(brief)),
   };
 }

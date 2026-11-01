@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { formatPercent } from '@/lib/format';
+import { formatPercent, toPercent } from '@/lib/format';
 import { clamp, cn } from '@/lib/utils';
 
 interface ProgressRingProps {
@@ -20,7 +20,7 @@ export function ProgressRing({ value, label, size = 120, strokeWidth = 10, child
   const circumference = 2 * Math.PI * radius;
   const bounded = clamp(value, 0, 1);
   const isOver = value > 1;
-  const percent = Math.round(value * 100);
+  const percent = toPercent(value);
 
   return (
     <div

@@ -56,3 +56,13 @@ export const IMAGE_WIDTHS = [480, 800, 1200, 1600] as const;
 
 /** JPEG quality requested from the Unsplash CDN. */
 export const IMAGE_QUALITY = 70;
+
+/** Width ÷ height ratios used across the app, so photo crops stay consistent. */
+export const ASPECT = {
+  square: 1,
+  landscape: 4 / 3,
+  portrait: 4 / 5,
+  tall: 3 / 4,
+  wide: 16 / 10,
+  cinema: 16 / 9,
+} as const;

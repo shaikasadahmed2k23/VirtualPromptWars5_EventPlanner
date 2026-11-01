@@ -6,10 +6,18 @@ export interface SearchableFilters {
   search: string;
 }
 
+/** A controlled value plus its change handler, ready to spread onto a filter control. */
+export interface FilterBinding<V> {
+  value: V;
+  onChange: (value: V) => void;
+}
+
 export interface ListFilters<T, F extends SearchableFilters> {
   /** Current control values (search is the raw, undebounced input). */
   filters: F;
   setFilter: <K extends keyof F>(key: K, value: F[K]) => void;
+  /** `{ value, onChange }` for one filter, e.g. `<FilterSelect {...bind('city')} />`. */
+  bind: <K extends keyof F>(key: K) => FilterBinding<F[K]>;
   /** Restores the initial filters. */
   clear: () => void;
   /** True when any control differs from its initial value. */
@@ -39,11 +47,20 @@ export function useListFilters<T, F extends SearchableFilters>(
   const setFilter = useCallback(<K extends keyof F>(key: K, value: F[K]) => {
     setFilters((current) => ({ ...current, [key]: value }));
   }, []);
+  const bind = useCallback(
+    <K extends keyof F>(key: K): FilterBinding<F[K]> => ({
+      value: filters[key],
+      onChange: (value) => {
+        setFilter(key, value);
+      },
+    }),
+    [filters, setFilter],
+  );
   const clear = useCallback(() => {
     setFilters(initial);
   }, [initial]);
 
   const isFiltered = (Object.keys(initial) as (keyof F)[]).some((key) => filters[key] !== initial[key]);
 
-  return { filters, setFilter, clear, isFiltered, results, resultsKey: JSON.stringify(applied) };
+  return { filters, setFilter, bind, clear, isFiltered, results, resultsKey: JSON.stringify(applied) };
 }

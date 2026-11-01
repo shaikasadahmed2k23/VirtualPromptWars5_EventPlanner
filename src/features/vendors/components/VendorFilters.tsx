@@ -5,13 +5,10 @@ import type { ListFilters } from '@/lib/hooks/useListFilters';
 import type { Vendor } from '@/types';
 import { VENDOR_FILTER_OPTIONS, type VendorFilters as VendorFilterValues } from '../lib/vendorFilters';
 
+type VendorFiltersProps = Pick<ListFilters<Vendor, VendorFilterValues>, 'bind' | 'isFiltered' | 'clear'>;
+
 /** Search, filter and sort controls for the vendor directory. */
-export function VendorFilters({
-  filters,
-  setFilter,
-  isFiltered,
-  clear,
-}: Pick<ListFilters<Vendor, VendorFilterValues>, 'filters' | 'setFilter' | 'isFiltered' | 'clear'>) {
+export function VendorFilters({ bind, isFiltered, clear }: VendorFiltersProps) {
   return (
     <div className="space-y-3">
       <FilterPanel label="Filter vendors" className="lg:grid-cols-6">
@@ -19,51 +16,17 @@ export function VendorFilters({
           label="Search vendors"
           placeholder="Search by name, city or service"
           className="sm:col-span-2 lg:col-span-6"
-          value={filters.search}
-          onChange={(value) => {
-            setFilter('search', value);
-          }}
+          {...bind('search')}
         />
-        <FilterSelect
-          label="Category"
-          value={filters.category}
-          options={VENDOR_FILTER_OPTIONS.category}
-          onChange={(value) => {
-            setFilter('category', value);
-          }}
-        />
-        <FilterSelect
-          label="City"
-          value={filters.city}
-          options={VENDOR_FILTER_OPTIONS.city}
-          onChange={(value) => {
-            setFilter('city', value);
-          }}
-        />
-        <FilterSelect
-          label="Price"
-          value={filters.priceTier}
-          options={VENDOR_FILTER_OPTIONS.priceTier}
-          onChange={(value) => {
-            setFilter('priceTier', value);
-          }}
-        />
-        <FilterSelect
-          label="Minimum rating"
-          value={filters.minRating}
-          options={VENDOR_FILTER_OPTIONS.minRating}
-          onChange={(value) => {
-            setFilter('minRating', value);
-          }}
-        />
+        <FilterSelect label="Category" options={VENDOR_FILTER_OPTIONS.category} {...bind('category')} />
+        <FilterSelect label="City" options={VENDOR_FILTER_OPTIONS.city} {...bind('city')} />
+        <FilterSelect label="Price" options={VENDOR_FILTER_OPTIONS.priceTier} {...bind('priceTier')} />
+        <FilterSelect label="Minimum rating" options={VENDOR_FILTER_OPTIONS.minRating} {...bind('minRating')} />
         <FilterSelect
           label="Sort by"
           className="lg:col-span-2"
-          value={filters.sort}
           options={VENDOR_FILTER_OPTIONS.sort}
-          onChange={(value) => {
-            setFilter('sort', value);
-          }}
+          {...bind('sort')}
         />
       </FilterPanel>
       {isFiltered ? (

@@ -1,9 +1,8 @@
 import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select } from '@/components/ui/input';
-import { RSVP_LABELS } from '@/lib/labels';
-import { RSVP_STATUSES, type RsvpStatus } from '@/types';
+import type { RsvpStatus } from '@/types';
+import { RsvpSelect } from './RsvpSelect';
 
 interface GuestBulkActionsProps {
   selectedCount: number;
@@ -48,21 +47,7 @@ export function GuestBulkActions({
         <label className="text-sm text-muted" htmlFor={rsvpId}>
           Set RSVP for selected
         </label>
-        <Select
-          id={rsvpId}
-          className="h-10 w-auto"
-          value={rsvp}
-          onChange={(event) => {
-            const next = RSVP_STATUSES.find((status) => status === event.target.value);
-            if (next) setRsvp(next);
-          }}
-        >
-          {RSVP_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {RSVP_LABELS[status]}
-            </option>
-          ))}
-        </Select>
+        <RsvpSelect id={rsvpId} className="h-10 w-auto" value={rsvp} onChange={setRsvp} />
         <Button
           size="sm"
           variant="secondary"

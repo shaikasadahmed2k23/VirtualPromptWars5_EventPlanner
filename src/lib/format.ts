@@ -43,9 +43,17 @@ export function currencySymbol(currency: CurrencyCode): string {
   return part?.value ?? currency;
 }
 
+/** Scale between a 0–1 ratio and a percentage. */
+export const PERCENT = 100;
+
+/** Whole-number percentage for a 0–1 ratio, e.g. `0.426` → `43`. */
+export function toPercent(ratio: number): number {
+  return Math.round(ratio * PERCENT);
+}
+
 /** Formats a 0–1 ratio as a whole percentage, e.g. `0.426` → `43%`. */
 export function formatPercent(ratio: number): string {
-  return `${Math.round(ratio * 100)}%`;
+  return `${toPercent(ratio)}%`;
 }
 
 /** Returns `singular` or `plural` (default `singular + "s"`) for `count`. */

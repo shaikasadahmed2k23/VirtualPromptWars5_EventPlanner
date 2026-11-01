@@ -19,27 +19,34 @@ interface ReviewStepProps {
 const NOT_SET = 'Not set';
 const orNotSet = (value: string | undefined) => (value?.trim() ? value : NOT_SET);
 
+const detailsLines = (draft: WizardDraft): ReactNode[] => [
+  orNotSet(draft.name),
+  draft.date ? `${formatDisplayDate(draft.date, 'EEEE, d MMMM yyyy')} at ${draft.startTime ?? ''}` : NOT_SET,
+  [draft.venue, draft.city].filter(Boolean).join(', ') || NOT_SET,
+];
+
+const guestsBudgetLines = (draft: WizardDraft): ReactNode[] => [
+  draft.guestCount ? pluralize(draft.guestCount, 'guest') : NOT_SET,
+  draft.budget && draft.currency
+    ? `${formatCurrency(draft.budget, draft.currency)} · ${CURRENCY_LABELS[draft.currency]}`
+    : NOT_SET,
+];
+
+const requirementsLines = (draft: WizardDraft): ReactNode[] => [
+  `Dietary: ${draft.dietary?.length ? draft.dietary.map((d) => DIETARY_LABELS[d]).join(', ') : 'none specified'}`,
+  `Accessibility: ${orNotSet(draft.accessibility)}`,
+  `Traditions: ${orNotSet(draft.cultural)}`,
+  `Notes: ${orNotSet(draft.notes)}`,
+];
+
+/** Summary lines for each wizard step, in step order. */
 function summarise(draft: WizardDraft): ReactNode[][] {
   return [
     [draft.type ? EVENT_TYPE_LABELS[draft.type] : NOT_SET],
-    [
-      orNotSet(draft.name),
-      draft.date ? `${formatDisplayDate(draft.date, 'EEEE, d MMMM yyyy')} at ${draft.startTime ?? ''}` : NOT_SET,
-      [draft.venue, draft.city].filter(Boolean).join(', ') || NOT_SET,
-    ],
-    [
-      draft.guestCount ? pluralize(draft.guestCount, 'guest') : NOT_SET,
-      draft.budget && draft.currency
-        ? `${formatCurrency(draft.budget, draft.currency)} · ${CURRENCY_LABELS[draft.currency]}`
-        : NOT_SET,
-    ],
+    detailsLines(draft),
+    guestsBudgetLines(draft),
     [draft.style ? EVENT_STYLE_LABELS[draft.style] : NOT_SET],
-    [
-      `Dietary: ${draft.dietary?.length ? draft.dietary.map((d) => DIETARY_LABELS[d]).join(', ') : 'none specified'}`,
-      `Accessibility: ${orNotSet(draft.accessibility)}`,
-      `Traditions: ${orNotSet(draft.cultural)}`,
-      `Notes: ${orNotSet(draft.notes)}`,
-    ],
+    requirementsLines(draft),
   ];
 }
 

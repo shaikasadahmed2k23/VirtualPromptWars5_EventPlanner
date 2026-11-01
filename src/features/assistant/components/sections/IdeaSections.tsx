@@ -18,10 +18,18 @@ export function DecorSection({ plan, event, actions, today }: PlanSectionProps) 
               <ItemActions
                 itemName={idea.title}
                 onAddToChecklist={() => {
-                  actions.addToChecklist(taskFromIdea(idea.title, idea.description, 'decor', event, today));
+                  actions.addToChecklist(
+                    taskFromIdea({ title: idea.title, description: idea.description, category: 'decor' }, event, today),
+                  );
                 }}
                 onAddToBudget={() => {
-                  actions.addToBudget(budgetFromIdea(idea.title, 'decor', plan.decorIdeas.length, plan, event));
+                  actions.addToBudget(
+                    budgetFromIdea(
+                      { name: idea.title, category: 'decor', ideasInCategory: plan.decorIdeas.length },
+                      plan,
+                      event,
+                    ),
+                  );
                 }}
               />
             </Card>
@@ -53,11 +61,15 @@ export function MenuSection({ plan, event, actions, today }: PlanSectionProps) {
                 itemName={`${course.course} course`}
                 onAddToChecklist={() => {
                   const title = `Finalise the ${course.course.toLowerCase()} menu`;
-                  actions.addToChecklist(taskFromIdea(title, course.items.join(', '), 'catering', event, today));
+                  actions.addToChecklist(
+                    taskFromIdea({ title, description: course.items.join(', '), category: 'catering' }, event, today),
+                  );
                 }}
                 onAddToBudget={() => {
                   const name = `${course.course} catering`;
-                  actions.addToBudget(budgetFromIdea(name, 'catering', plan.menu.length, plan, event));
+                  actions.addToBudget(
+                    budgetFromIdea({ name, category: 'catering', ideasInCategory: plan.menu.length }, plan, event),
+                  );
                 }}
               />
             </Card>
@@ -87,12 +99,20 @@ export function ActivitiesSection({ plan, event, actions, today }: PlanSectionPr
                 itemName={activity.name}
                 onAddToChecklist={() => {
                   actions.addToChecklist(
-                    taskFromIdea(`Arrange: ${activity.name}`, activity.description, 'vendors', event, today),
+                    taskFromIdea(
+                      { title: `Arrange: ${activity.name}`, description: activity.description, category: 'vendors' },
+                      event,
+                      today,
+                    ),
                   );
                 }}
                 onAddToBudget={() => {
                   actions.addToBudget(
-                    budgetFromIdea(activity.name, 'entertainment', plan.activities.length, plan, event),
+                    budgetFromIdea(
+                      { name: activity.name, category: 'entertainment', ideasInCategory: plan.activities.length },
+                      plan,
+                      event,
+                    ),
                   );
                 }}
               />

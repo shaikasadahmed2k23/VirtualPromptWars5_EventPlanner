@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 import { TASK_CATEGORIES, TASK_PRIORITIES } from '@shared/domain';
 import { Field } from '@/components/ui/field';
 import { FormDialog } from '@/components/ui/form-dialog';
-import { Input, Select, Textarea } from '@/components/ui/input';
+import { Input, LabelledOptions, Select, Textarea } from '@/components/ui/input';
 import { useDialogForm } from '@/lib/hooks/useDialogForm';
 import { TASK_CATEGORY_LABELS, TASK_PRIORITY_LABELS } from '@/lib/labels';
 import type { Id, Task, TaskInput } from '@/types';
@@ -57,11 +57,7 @@ export function TaskFormDialog({ eventId, task, trigger }: TaskFormDialogProps) 
         <Field label="Priority" required>
           {(props) => (
             <Select {...props} {...register('priority')}>
-              {TASK_PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>
-                  {TASK_PRIORITY_LABELS[priority]}
-                </option>
-              ))}
+              <LabelledOptions values={TASK_PRIORITIES} labels={TASK_PRIORITY_LABELS} />
             </Select>
           )}
         </Field>
@@ -69,11 +65,7 @@ export function TaskFormDialog({ eventId, task, trigger }: TaskFormDialogProps) 
       <Field label="Category" required>
         {(props) => (
           <Select {...props} {...register('category')}>
-            {TASK_CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {TASK_CATEGORY_LABELS[category]}
-              </option>
-            ))}
+            <LabelledOptions values={TASK_CATEGORIES} labels={TASK_CATEGORY_LABELS} />
           </Select>
         )}
       </Field>

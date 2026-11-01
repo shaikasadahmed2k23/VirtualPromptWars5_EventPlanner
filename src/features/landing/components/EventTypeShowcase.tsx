@@ -3,13 +3,12 @@ import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { paths } from '@/app/navigation';
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
 import { EVENT_TYPE_LABELS } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import { EditorialHeading } from './EditorialHeading';
-
-const CARD_ASPECT = 3 / 4;
 
 /** Four occasion cards in a staggered editorial grid; each opens the wizard preselected. */
 export function EventTypeShowcase() {
@@ -28,7 +27,7 @@ export function EventTypeShowcase() {
                 <div className="aspect-[4/3] overflow-hidden sm:aspect-[3/4]">
                   <Photo
                     photo={PHOTOS[meta.photo]}
-                    aspect={CARD_ASPECT}
+                    aspect={ASPECT.tall}
                     width={600}
                     sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
                     className="transition-transform duration-700 group-hover:scale-105"

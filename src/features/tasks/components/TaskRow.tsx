@@ -1,9 +1,9 @@
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { ConfirmDeleteButton } from '@/components/ui/confirm-dialog';
 import { TASK_CATEGORY_LABELS } from '@/lib/labels';
 import type { ISODate, Task } from '@/types';
 import { formatTaskDeadline } from '../lib/taskTimeline';
@@ -53,16 +53,11 @@ export const TaskRow = memo(function TaskRow({ task, today, onToggle, onDelete }
             </Button>
           }
         />
-        <ConfirmDialog
-          trigger={
-            <Button variant="ghost" size="icon-sm" aria-label={`Delete ${task.title}`}>
-              <Trash2 aria-hidden="true" />
-            </Button>
-          }
+        <ConfirmDeleteButton
+          itemName={task.title}
           title="Delete task?"
           description={`Remove “${task.title}” from this checklist?`}
           confirmLabel="Delete task"
-          destructive
           onConfirm={() => {
             onDelete(task);
           }}

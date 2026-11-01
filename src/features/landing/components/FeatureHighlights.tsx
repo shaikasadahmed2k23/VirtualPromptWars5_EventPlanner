@@ -1,4 +1,5 @@
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { FEATURES } from '../content';
 import { EditorialHeading } from './EditorialHeading';
@@ -10,11 +11,16 @@ export function FeatureHighlights() {
       <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.25fr]">
         <div className="relative mx-auto w-full max-w-md lg:max-w-none">
           <div className="aspect-[4/5] overflow-hidden rounded-[2rem] shadow-lift">
-            <Photo photo={PHOTOS.floralTable} aspect={4 / 5} width={800} sizes="(min-width: 1024px) 40vw, 90vw" />
+            <Photo
+              photo={PHOTOS.floralTable}
+              aspect={ASPECT.portrait}
+              width={800}
+              sizes="(min-width: 1024px) 40vw, 90vw"
+            />
           </div>
           <div className="absolute -bottom-8 -right-4 w-2/5 overflow-hidden rounded-2xl border-4 border-ivory shadow-lift sm:-right-8">
             <div className="aspect-square">
-              <Photo photo={PHOTOS.lushBouquet} aspect={1} width={480} sizes="18vw" />
+              <Photo photo={PHOTOS.lushBouquet} aspect={ASPECT.square} width={480} sizes="18vw" />
             </div>
           </div>
         </div>

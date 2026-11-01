@@ -1,5 +1,6 @@
 import { ConfettiScatter } from '@/components/decor/ConfettiScatter';
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { EVENT_TYPE_META } from '@/features/events/lib/eventTypeMeta';
 import { combineDateTime, formatDisplayDate } from '@/lib/dates';
@@ -21,7 +22,7 @@ export function CountdownPanel({ event }: { event: CelebrationEvent }) {
   return (
     <div className="relative isolate flex min-h-64 flex-col justify-end overflow-hidden rounded-2xl p-6 text-white">
       <div className="absolute inset-0 -z-20">
-        <Photo photo={photo} aspect={4 / 5} width={640} sizes="(min-width: 1024px) 30vw, 100vw" decorative />
+        <Photo photo={photo} aspect={ASPECT.portrait} width={640} sizes="(min-width: 1024px) 30vw, 100vw" decorative />
       </div>
       <div className="absolute inset-0 -z-10 bg-linear-to-t from-charcoal/90 via-charcoal/75 to-charcoal/50" />
       <ConfettiScatter className="absolute inset-x-0 top-3 h-16 w-full opacity-80" />

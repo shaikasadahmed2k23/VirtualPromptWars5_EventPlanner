@@ -6,6 +6,7 @@ import { AI_SERVER_TIMEOUT_MS } from '../shared/limits.js';
 export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
 
 const DEFAULT_PORT = 8787;
+const MAX_PORT = 65_535;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 20;
 const CACHE_MAX_ENTRIES = 200;
@@ -25,7 +26,7 @@ const originList = z
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65_535).default(DEFAULT_PORT),
+  PORT: z.coerce.number().int().min(1).max(MAX_PORT).default(DEFAULT_PORT),
   GEMINI_API_KEY: z
     .string()
     .trim()

@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { VENDOR_CATEGORY_PHOTOS } from '@/data/seed';
 import { formatCurrency } from '@/lib/format';
@@ -10,7 +11,6 @@ import type { Vendor } from '@/types';
 import { priceTierLabel } from '../lib/vendorFilters';
 
 const GALLERY_SIZE = 3;
-const HERO_ASPECT = 16 / 9;
 
 /** Vendor profile with a small gallery, pricing and contact details. */
 export function VendorDetailsDialog({ vendor, trigger }: { vendor: Vendor; trigger: ReactElement }) {
@@ -33,7 +33,7 @@ export function VendorDetailsDialog({ vendor, trigger }: { vendor: Vendor; trigg
             <Photo
               key={key}
               photo={PHOTOS[key]}
-              aspect={index === 0 ? HERO_ASPECT : 1}
+              aspect={index === 0 ? ASPECT.cinema : ASPECT.square}
               sizes="(min-width: 768px) 40rem, 90vw"
               className={index === 0 ? 'col-span-2' : ''}
             />

@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { THEME_MOOD_LABELS } from '@/lib/labels';
 import type { ThemeSuggestion } from '@/types';
 import { selectThemePhotos } from '../lib/themeGallery';
@@ -55,7 +56,7 @@ export function ThemeCard({ theme, isInUse, onUse }: ThemeCardProps) {
         <ul className="grid grid-cols-2 gap-2" aria-label={`${theme.name} inspiration photos`}>
           {photos.map((photo) => (
             <li key={photo.id} className="aspect-square overflow-hidden rounded-xl">
-              <Photo photo={photo} aspect={1} width={400} sizes="(min-width: 1280px) 12vw, 45vw" />
+              <Photo photo={photo} aspect={ASPECT.square} width={400} sizes="(min-width: 1280px) 12vw, 45vw" />
             </li>
           ))}
         </ul>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { paths } from '@/app/navigation';
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { PHOTOS } from '@/data/photos';
 import { createSeedEvent } from '@/data/seed';
 import { daysBetween, formatDisplayDate, todayISO } from '@/lib/dates';
@@ -22,7 +23,7 @@ export function DemoPreviewCard({ className }: { className?: string }) {
       )}
     >
       <div className="aspect-[4/3] overflow-hidden rounded-xl">
-        <Photo photo={PHOTOS.ringsHands} aspect={4 / 3} width={480} sizes="18rem" decorative />
+        <Photo photo={PHOTOS.ringsHands} aspect={ASPECT.landscape} width={480} sizes="18rem" decorative />
       </div>
       <div className="px-1 pb-1 pt-3">
         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-rose-ink">Sample plan</p>

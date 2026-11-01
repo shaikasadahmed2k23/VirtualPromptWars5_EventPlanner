@@ -5,11 +5,10 @@ import { FloralSprig } from '@/components/decor/FloralSprig';
 import { Button } from '@/components/ui/button';
 import { Photo } from '@/components/ui/photo';
 import { PHOTOS } from '@/data/photos';
-import { DEMO_EVENT_ID } from '@/lib/constants';
+import { ASPECT, DEMO_EVENT_ID } from '@/lib/constants';
 import { HERO_COPY } from '../content';
 import { DemoPreviewCard } from './DemoPreviewCard';
 
-const HERO_ASPECT = 16 / 10;
 const HERO_WIDTH = 1600;
 
 /** Editorial hero: full-bleed photograph fading into ivory behind the headline. */
@@ -19,7 +18,7 @@ export function LandingHero() {
       <div className="relative h-72 sm:h-[26rem] lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[64%]">
         <Photo
           photo={PHOTOS.ceremonyAisle}
-          aspect={HERO_ASPECT}
+          aspect={ASPECT.wide}
           width={HERO_WIDTH}
           sizes="(min-width: 1024px) 64vw, 100vw"
           priority

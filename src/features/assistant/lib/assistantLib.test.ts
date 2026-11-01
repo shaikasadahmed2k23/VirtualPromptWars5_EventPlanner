@@ -36,14 +36,16 @@ describe('plan actions', () => {
   });
 
   it('gives ideas a category-appropriate lead time', () => {
-    expect(taskFromIdea('Lanterns', 'Hand-painted', 'decor', event, TODAY)).toMatchObject({
+    expect(
+      taskFromIdea({ title: 'Lanterns', description: 'Hand-painted', category: 'decor' }, event, TODAY),
+    ).toMatchObject({
       dueDate: '2026-12-30',
       notes: 'Hand-painted',
     });
   });
 
   it('splits a category’s share of the budget across its ideas', () => {
-    const line = budgetFromIdea('Lanterns', 'decor', 4, plan, event);
+    const line = budgetFromIdea({ name: 'Lanterns', category: 'decor', ideasInCategory: 4 }, plan, event);
     // Seed plan allocates 12% to décor: 18L × 12% ÷ 4 ideas.
     expect(line).toMatchObject({ category: 'decor', estimated: 54_000, actual: 0, paid: false });
   });

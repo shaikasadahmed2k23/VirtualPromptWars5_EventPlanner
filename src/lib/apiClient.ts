@@ -46,19 +46,15 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
-/**
- * POSTs JSON to an AI endpoint and returns the validated payload and metadata.
- * Never trusts the response: both the envelope and `data` are schema-checked.
- */
-export async function postAI<T>(
+/** Sends the request, turning transport failures (cancel, deadline, offline) into typed client errors. */
+async function sendJson(
   path: string,
   body: unknown,
-  { schema, signal, timeoutMs = AI_REQUEST_TIMEOUT_MS }: PostOptions<T>,
-): Promise<{ data: T; meta: AIResponseMeta }> {
+  { signal, timeoutMs }: { signal: AbortSignal | undefined; timeoutMs: number },
+): Promise<Response> {
   const timeout = AbortSignal.timeout(timeoutMs);
-  let response: Response;
   try {
-    response = await fetch(path, {
+    return await fetch(path, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(body),
@@ -70,7 +66,18 @@ export async function postAI<T>(
     if (timeout.aborted) throw new ApiClientError('TIMEOUT', 'The planner took too long to respond.');
     throw new ApiClientError('NETWORK_ERROR', error instanceof Error ? error.message : 'Network request failed.');
   }
+}
 
+/**
+ * POSTs JSON to an AI endpoint and returns the validated payload and metadata.
+ * Never trusts the response: both the envelope and `data` are schema-checked.
+ */
+export async function postAI<T>(
+  path: string,
+  body: unknown,
+  { schema, signal, timeoutMs = AI_REQUEST_TIMEOUT_MS }: PostOptions<T>,
+): Promise<{ data: T; meta: AIResponseMeta }> {
+  const response = await sendJson(path, body, { signal, timeoutMs });
   const payload = await readJson(response);
   if (!response.ok) {
     const parsed = apiErrorBodySchema.safeParse(payload);

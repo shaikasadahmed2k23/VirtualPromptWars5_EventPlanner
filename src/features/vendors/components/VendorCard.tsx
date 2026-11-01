@@ -3,14 +3,13 @@ import { memo, useId } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Photo } from '@/components/ui/photo';
+import { ASPECT } from '@/lib/constants';
 import { PHOTOS, photoById } from '@/data/photos';
 import { VENDOR_CATEGORY_LABELS } from '@/lib/labels';
 import { PRICE_TIERS, type CelebrationEvent, type Vendor } from '@/types';
 import { priceTierLabel } from '../lib/vendorFilters';
 import { QuoteDialog } from './QuoteDialog';
 import { VendorDetailsDialog } from './VendorDetailsDialog';
-
-const CARD_PHOTO_ASPECT = 16 / 10;
 
 interface VendorCardProps {
   vendor: Vendor;
@@ -21,14 +20,83 @@ interface VendorCardProps {
   onAddToBudget: (vendor: Vendor) => void;
 }
 
-/** Directory listing: photo (opens details), rating, tags and planning actions. */
-export const VendorCard = memo(function VendorCard({
+type HeaderProps = Pick<VendorCardProps, 'vendor' | 'shortlisted' | 'onToggleShortlist'> & { headingId: string };
+
+/** Category, name (the card's accessible name), city and price level, plus the shortlist toggle. */
+function VendorCardHeader({ vendor, shortlisted, onToggleShortlist, headingId }: HeaderProps) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-rose-ink">
+          {VENDOR_CATEGORY_LABELS[vendor.category]}
+        </p>
+        <h2 id={headingId} className="mt-1 text-xl">
+          {vendor.name}
+        </h2>
+        <p className="text-sm text-muted">
+          {vendor.city} · <span aria-hidden="true">{priceTierLabel(vendor.priceTier)}</span>
+          <span className="sr-only">
+            price level {vendor.priceTier} of {PRICE_TIERS.length}
+          </span>
+        </p>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={shortlisted ? `Remove ${vendor.name} from shortlist` : `Add ${vendor.name} to shortlist`}
+        aria-pressed={shortlisted}
+        onClick={() => {
+          onToggleShortlist(vendor);
+        }}
+      >
+        <Heart aria-hidden="true" fill={shortlisted ? 'currentColor' : 'none'} />
+      </Button>
+    </div>
+  );
+}
+
+/** Planning actions: add to budget, request a quote, email and call. */
+function VendorCardActions({
   vendor,
-  shortlisted,
   event,
-  onToggleShortlist,
   onAddToBudget,
-}: VendorCardProps) {
+}: Pick<VendorCardProps, 'vendor' | 'event' | 'onAddToBudget'>) {
+  return (
+    <div className="flex flex-wrap gap-2 pt-1">
+      <Button
+        size="sm"
+        disabled={!event}
+        onClick={() => {
+          onAddToBudget(vendor);
+        }}
+      >
+        Add to budget
+      </Button>
+      <QuoteDialog
+        vendor={vendor}
+        event={event}
+        trigger={
+          <Button size="sm" variant="secondary">
+            Request quote
+          </Button>
+        }
+      />
+      <Button asChild variant="ghost" size="icon-sm">
+        <a href={`mailto:${vendor.email}`} aria-label={`Email ${vendor.name}`}>
+          <Mail aria-hidden="true" />
+        </a>
+      </Button>
+      <Button asChild variant="ghost" size="icon-sm">
+        <a href={`tel:${vendor.phone.replaceAll(' ', '')}`} aria-label={`Call ${vendor.name}`}>
+          <Phone aria-hidden="true" />
+        </a>
+      </Button>
+    </div>
+  );
+}
+
+/** Directory listing: photo (opens details), rating, tags and planning actions. */
+export const VendorCard = memo(function VendorCard({ vendor, ...props }: VendorCardProps) {
   const headingId = useId();
   const photo = photoById(vendor.photoId) ?? PHOTOS.mandapHall;
 
@@ -43,40 +111,14 @@ export const VendorCard = memo(function VendorCard({
           <button type="button" className="block w-full text-left" aria-label={`View details for ${vendor.name}`}>
             <Photo
               photo={photo}
-              aspect={CARD_PHOTO_ASPECT}
+              aspect={ASPECT.wide}
               sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 100vw"
             />
           </button>
         }
       />
       <div className="space-y-3 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-rose-ink">
-              {VENDOR_CATEGORY_LABELS[vendor.category]}
-            </p>
-            <h2 id={headingId} className="mt-1 text-xl">
-              {vendor.name}
-            </h2>
-            <p className="text-sm text-muted">
-              {vendor.city} · <span aria-hidden="true">{priceTierLabel(vendor.priceTier)}</span>
-              <span className="sr-only">
-                price level {vendor.priceTier} of {PRICE_TIERS.length}
-              </span>
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={shortlisted ? `Remove ${vendor.name} from shortlist` : `Add ${vendor.name} to shortlist`}
-            aria-pressed={shortlisted}
-            onClick={() => {
-              onToggleShortlist(vendor);
-            }}
-          >
-            <Heart aria-hidden="true" fill={shortlisted ? 'currentColor' : 'none'} />
-          </Button>
-        </div>
+        <VendorCardHeader vendor={vendor} headingId={headingId} {...props} />
         <p className="text-sm text-muted">{vendor.description}</p>
         <p className="flex items-center gap-1 text-sm">
           <Star className="size-4 fill-gold text-gold-ink" aria-hidden="true" />
@@ -89,36 +131,7 @@ export const VendorCard = memo(function VendorCard({
             </li>
           ))}
         </ul>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Button
-            size="sm"
-            disabled={!event}
-            onClick={() => {
-              onAddToBudget(vendor);
-            }}
-          >
-            Add to budget
-          </Button>
-          <QuoteDialog
-            vendor={vendor}
-            event={event}
-            trigger={
-              <Button size="sm" variant="secondary">
-                Request quote
-              </Button>
-            }
-          />
-          <Button asChild variant="ghost" size="icon-sm">
-            <a href={`mailto:${vendor.email}`} aria-label={`Email ${vendor.name}`}>
-              <Mail aria-hidden="true" />
-            </a>
-          </Button>
-          <Button asChild variant="ghost" size="icon-sm">
-            <a href={`tel:${vendor.phone.replaceAll(' ', '')}`} aria-label={`Call ${vendor.name}`}>
-              <Phone aria-hidden="true" />
-            </a>
-          </Button>
-        </div>
+        <VendorCardActions vendor={vendor} {...props} />
       </div>
     </article>
   );

@@ -1,4 +1,5 @@
 import type { Photo as PhotoData } from '@/data/photos';
+import { ASPECT } from '@/lib/constants';
 import { unsplashSrcSet, unsplashUrl } from '@/lib/images';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +18,6 @@ interface PhotoProps {
   className?: string;
 }
 
-const DEFAULT_ASPECT = 4 / 3;
 const DEFAULT_WIDTH = 800;
 
 /**
@@ -26,7 +26,7 @@ const DEFAULT_WIDTH = 800;
  */
 export function Photo({
   photo,
-  aspect = DEFAULT_ASPECT,
+  aspect = ASPECT.landscape,
   width = DEFAULT_WIDTH,
   sizes = '100vw',
   priority = false,

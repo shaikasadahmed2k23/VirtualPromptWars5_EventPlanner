@@ -1,6 +1,7 @@
 import type { AIPlan } from '@shared/ai';
 import { BUDGET_WEIGHTS } from '@shared/budgetWeights';
 import { clampISODate, shiftISODate, shiftISOMonths } from '@/lib/dates';
+import { PERCENT } from '@/lib/format';
 import { BUDGET_CATEGORY_LABELS } from '@/lib/labels';
 import type { BudgetCategory, BudgetItemInput, CelebrationEvent, ISODate, TaskCategory, TaskInput } from '@/types';
 
@@ -17,7 +18,6 @@ const LEAD_DAYS: Record<TaskCategory, number> = {
   other: 21,
 };
 
-const PERCENT = 100;
 const ROUNDING_UNIT = 100;
 
 type EventShape = Pick<CelebrationEvent, 'date' | 'budget'>;
@@ -42,14 +42,22 @@ export function taskFromSuggestion(
   };
 }
 
-/** Converts any plan idea (décor, menu course, activity) into a task due a sensible lead time before the event. */
-export function taskFromIdea(
-  title: string,
-  description: string,
-  category: TaskCategory,
-  event: EventShape,
-  today: ISODate,
-): TaskInput {
+/** A plan idea (décor, menu course, activity) about to become a checklist task. */
+export interface TaskIdea {
+  title: string;
+  description: string;
+  category: TaskCategory;
+}
+
+/** A plan idea about to become a budget line; `ideasInCategory` ideas share the category's budget. */
+export interface BudgetIdea {
+  name: string;
+  category: BudgetCategory;
+  ideasInCategory: number;
+}
+
+/** Converts any plan idea into a task due a sensible lead time before the event. */
+export function taskFromIdea({ title, description, category }: TaskIdea, event: EventShape, today: ISODate): TaskInput {
   return {
     title,
     notes: description,
@@ -87,9 +95,7 @@ export function budgetFromAllocation(line: AIPlan['budgetAllocation'][number], e
  * evenly across the plan's ideas in that category.
  */
 export function budgetFromIdea(
-  name: string,
-  category: BudgetCategory,
-  ideasInCategory: number,
+  { name, category, ideasInCategory }: BudgetIdea,
   plan: AIPlan,
   event: CelebrationEvent,
 ): BudgetItemInput {

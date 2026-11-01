@@ -15,6 +15,44 @@ import { formatDisplayDate, todayISO } from '@/lib/dates';
 import { cn } from '@/lib/utils';
 import type { CelebrationEvent, Task } from '@/types';
 
+interface UpcomingTaskItemProps {
+  task: Task;
+  today: string;
+  onComplete: (task: Task) => void;
+}
+
+/** One open task: an inline completion checkbox, its due date and badges. */
+function UpcomingTaskItem({ task, today, onComplete }: UpcomingTaskItemProps) {
+  const checkboxId = `upcoming-${task.id}`;
+  return (
+    <li
+      className={cn(
+        'flex items-start gap-3 py-3',
+        isTaskOverdue(task, today) && '-mx-2 rounded-xl bg-danger-soft/40 px-2',
+      )}
+    >
+      <Checkbox
+        id={checkboxId}
+        className="mt-0.5"
+        checked={task.done}
+        onCheckedChange={() => {
+          onComplete(task);
+        }}
+      />
+      <div className="min-w-0 flex-1">
+        <label htmlFor={checkboxId} className="cursor-pointer font-medium">
+          {task.title}
+        </label>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
+          <span>Due {formatDisplayDate(task.dueDate)}</span>
+          <DueBadge task={task} today={today} />
+          <PriorityBadge priority={task.priority} />
+        </div>
+      </div>
+    </li>
+  );
+}
+
 /** The next open tasks, overdue first, each completable inline (with undo). */
 export function UpcomingTasksWidget({ event, isLoading }: { event: CelebrationEvent; isLoading: boolean }) {
   const tasks = useEventTasks(event.id);
@@ -51,40 +89,17 @@ export function UpcomingTasksWidget({ event, isLoading }: { event: CelebrationEv
             </Button>
           }
         />
-      ) : upcoming.length === 0 ? (
+      ) : null}
+      {tasks.length > 0 && upcoming.length === 0 ? (
         <EmptyState icon={PartyPopper} title="All caught up" description="Every task is done. Time to celebrate!" />
-      ) : (
+      ) : null}
+      {upcoming.length > 0 ? (
         <ul className="divide-y divide-line">
           {upcoming.map((task) => (
-            <li
-              key={task.id}
-              className={cn(
-                'flex items-start gap-3 py-3',
-                isTaskOverdue(task, today) && '-mx-2 rounded-xl bg-danger-soft/40 px-2',
-              )}
-            >
-              <Checkbox
-                id={`upcoming-${task.id}`}
-                className="mt-0.5"
-                checked={task.done}
-                onCheckedChange={() => {
-                  complete(task);
-                }}
-              />
-              <div className="min-w-0 flex-1">
-                <label htmlFor={`upcoming-${task.id}`} className="cursor-pointer font-medium">
-                  {task.title}
-                </label>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                  <span>Due {formatDisplayDate(task.dueDate)}</span>
-                  <DueBadge task={task} today={today} />
-                  <PriorityBadge priority={task.priority} />
-                </div>
-              </div>
-            </li>
+            <UpcomingTaskItem key={task.id} task={task} today={today} onComplete={complete} />
           ))}
         </ul>
-      )}
+      ) : null}
     </WidgetCard>
   );
 }

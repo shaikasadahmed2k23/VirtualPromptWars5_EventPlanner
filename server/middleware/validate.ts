@@ -1,6 +1,6 @@
 import type { Request, RequestHandler, Response } from 'express';
 import type { z, ZodTypeAny } from 'zod';
-import { ApiError } from '../lib/errors.js';
+import { ApiError, HTTP_STATUS } from '../lib/errors.js';
 
 /**
  * Wraps a route handler so it only runs with a body that passed `schema`.
@@ -14,7 +14,7 @@ export function withValidatedBody<S extends ZodTypeAny>(
     const result = schema.safeParse(req.body);
     if (!result.success) {
       const issues = result.error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message }));
-      throw new ApiError(400, 'VALIDATION_ERROR', 'The request body is invalid.', issues);
+      throw new ApiError(HTTP_STATUS.badRequest, 'VALIDATION_ERROR', 'The request body is invalid.', issues);
     }
     await handler(result.data as z.output<S>, req, res);
   };
